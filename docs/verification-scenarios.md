@@ -43,5 +43,6 @@ Initial local verification on Windows, 2026-10-28:
 - PowerShell 7.6.9: all 31 checks passed.
 - OpenCode 1.19.1: `opencode agent list` successfully loaded `web-analyzer (primary)` and discovered the three project skill directories.
 - Passive native/UI Automation discovery: identified the existing Chrome selected page on the Windows primary display while another application held foreground focus. No browser tab was opened or navigated, and no editor was modified.
+- GitHub Actions: the Windows verification job passed both PowerShell steps on `main` and `feat/initial-project` after publication. Current status is available on the repository's Actions tab.
 
 Live editor transfer was not exercised against the user's current page during project setup. It is not covered by unattended CI. Do not interpret the manual scenarios listed above as already executed evidence.
