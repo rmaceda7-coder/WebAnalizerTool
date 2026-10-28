@@ -1,0 +1,26 @@
+# Local browser evidence and work products
+artifacts/
+*.jtl
+*.log
+.playwright-mcp/
+playwright-report/
+test-results/
+browser-profile/
+user-data-dir/
+
+# Local credentials and configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+.serena/
+
+# Editor and OS files
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
