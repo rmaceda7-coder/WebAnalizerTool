@@ -1,8 +1,8 @@
-# Web Analyzer and Acting Tool
+# WebAnalizerTool — Web Analyzer and Acting Tool
 
 Analyze the existing Chrome page on the **primary Windows monitor**, edit browser code editors, and keep the user in control of submission.
 
-[![Verify](https://github.com/rmaceda7-coder/web-analyzer-and-acting-tool/actions/workflows/verify.yml/badge.svg)](https://github.com/rmaceda7-coder/web-analyzer-and-acting-tool/actions/workflows/verify.yml)
+[![Verify](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/workflows/verify.yml)
 
 ## What it does
 
@@ -26,7 +26,7 @@ Analyze the existing Chrome page on the **primary Windows monitor**, edit browse
 ### Install
 
 ```powershell
-git clone https://github.com/rmaceda7-coder/web-analyzer-and-acting-tool.git
+git clone https://github.com/rmaceda7-coder/WebAnalizerTool.git
 ```
 
 Open a terminal in the cloned folder and run:
@@ -109,7 +109,7 @@ AUTHORS.md             Creator signature and contact publication status
 - LinkedIn: [Ramiro Maceda Toranzos](https://www.linkedin.com/in/ramiro-maceda-toranzos-928746214)
 - Email / Correo: [rmaceda7@gmail.com](mailto:rmaceda7@gmail.com)
 - GitHub: [rmaceda7-coder](https://github.com/rmaceda7-coder)
-- Repository: [web-analyzer-and-acting-tool](https://github.com/rmaceda7-coder/web-analyzer-and-acting-tool)
+- Repository: [WebAnalizerTool](https://github.com/rmaceda7-coder/WebAnalizerTool)
 
 See [AUTHORS.md](AUTHORS.md). Contact details were provided by the creator for publication.
 

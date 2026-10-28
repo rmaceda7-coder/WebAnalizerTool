@@ -8,7 +8,7 @@
 | LinkedIn | https://www.linkedin.com/in/ramiro-maceda-toranzos-928746214 |
 | Email | [rmaceda7@gmail.com](mailto:rmaceda7@gmail.com) |
 | GitHub | https://github.com/rmaceda7-coder |
-| GitHub repository | https://github.com/rmaceda7-coder/web-analyzer-and-acting-tool |
+| GitHub repository | https://github.com/rmaceda7-coder/WebAnalizerTool |
 
 ## Attribution convention
 

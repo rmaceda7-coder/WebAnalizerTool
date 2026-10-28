@@ -3,7 +3,7 @@
 ## Install for OpenCode
 
 1. Install Git, Chrome, and OpenCode on Windows 10/11.
-2. Clone `https://github.com/rmaceda7-coder/web-analyzer-and-acting-tool.git`.
+2. Clone `https://github.com/rmaceda7-coder/WebAnalizerTool.git`.
 3. Open a PowerShell terminal in the clone's root directory.
 4. Run `powershell.exe -NoProfile -STA -File tests/Run-Tests.ps1`.
 5. Open Chrome on the Windows primary display with the target tab selected.
