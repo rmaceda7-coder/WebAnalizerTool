@@ -37,7 +37,8 @@ Updated the disposable fixture to show test assertions and identify a test scena
 - `opencode agent list`: completed successfully and listed `web-analyzer (primary)` with the project-local skill directories.
 - `git diff --check`: passed. A terminology review confirmed that examples now use web test scenarios; the targeted documentation-language scan returned no Spanish text.
 - Restart OpenCode to load the updated agent and skill instructions. Live application interactions, test-runner execution, and the updated fixture's desktop scenarios have not been performed by this change.
-- The user authorized committing and pushing WAT-005 together with WAT-004 to `main`. The file-history links identify the publication revision; hosted verification must be checked for that exact commit.
+- Published WAT-005 together with WAT-004 to `main` in [9daba60](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/9daba60f03d09c1be2ff54142ee86de6a136b146), following the user's authorization.
+- [Verify run 40938004677](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/runs/40938004677) passed for that exact commit: Node.js 22 MCP/fixture-server tests, Windows PowerShell 5.1 tests, and PowerShell 7 tests. Observed with `gh run watch 40938004677 --exit-status --interval 10`, which exited successfully. This hosted evidence was recorded in a subsequent documentation-only commit.
 
 ## WAT-004 — English-only documentation and guidelines
 
@@ -68,7 +69,7 @@ Established English as the required language for documentation and guidelines, i
 - `node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs`: all 6 tests passed.
 - `git diff --check`: passed.
 - No live browser/editor checks were performed for this documentation-only change; the pending desktop scenarios remain recorded in WAT-003.
-- The user authorized publication together with WAT-005 on `main`. The file-history links identify the publication revision.
+- Published with WAT-005 on `main` in [9daba60](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/9daba60f03d09c1be2ff54142ee86de6a136b146). The shared [Verify run 40938004677](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/runs/40938004677) passed for that revision.
 
 ## WAT-003 — Editor-transfer reliability coverage and publication traceability
 
