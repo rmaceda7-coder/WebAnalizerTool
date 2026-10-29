@@ -38,6 +38,7 @@ The shipped scripts deliberately expose **no Run/Submit operation**. Editor writ
 
 ## Development
 
+- Use `main` for this project's work and authorized GitHub updates. Do not create or publish changes on another branch unless the user explicitly requests it. Inspect local and remote history before publication; the currently checked-out branch alone does not establish the intended destination.
 - After completing and verifying modifications or implementations, always ask the user whether to update this project's GitHub repository. Keep GitHub synchronization as an explicit closeout step so local work is not silently left unpublished. Do not commit, push, or create a pull request without the user's authorization; report pending synchronization until it is performed.
 - Keep Windows-specific code in `src/WindowsBrowser.psm1`; public entry points belong in `scripts/`.
 - Run `powershell.exe -NoProfile -STA -File tests/Run-Tests.ps1` and the PowerShell 7 equivalent when available.
