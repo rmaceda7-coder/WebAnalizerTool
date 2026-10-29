@@ -8,8 +8,8 @@ Every new implementation or behavior/policy change must add a dated entry here a
 
 - **Date:** 2026-10-29
 - **Release:** 0.2.0 (unreleased)
-- **Publication:** User authorized publication to `main`; commit/push and hosted verification are pending at preparation time.
-- **Implementation history:** [contract history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/AGENTS.md), [agent history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/.opencode/agents/web-analyzer.md), and [this record's history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/docs/implementation-history.md). New-file links become available after authorized publication.
+- **Publication:** Published to `main` with user authorization in [11e0f39](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/11e0f3903675506e9914d184fe757b7542fcddb3).
+- **Implementation history:** [contract history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/AGENTS.md), [agent history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/.opencode/agents/web-analyzer.md), and [this record's history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/docs/implementation-history.md).
 
 ### Requirement and changes
 
@@ -38,7 +38,8 @@ Added a connected-MCP capability matrix, server initialization/scope requirement
 - `opencode agent list`: completed successfully, listed `web-analyzer (primary)`, and included the new orchestration skill directory. This is a loader check, not proof of runtime model behavior or authenticated MCP connectivity.
 - `git diff --check`: passed; reviewed tracked changes and new policy/skill/test files. Git emitted its existing LF-to-CRLF normalization notice for PowerShell files; no whitespace errors were reported.
 - Restart OpenCode and opt in to relevant connected-MCP manual scenarios before claiming live compatibility. No live runner startup, editor interaction, Postman collection run, JMeter load, or GitHub publication is part of this policy change's unattended checks.
-- The user authorized GitHub synchronization to `main`. Publish the guideline/test changes and this evidence together, then record the resulting implementation commit and hosted verification. File-history links provide traceability without requiring a commit to contain its own hash.
+- Published the guideline/test changes and local verification evidence together to `main` in [11e0f39](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/11e0f3903675506e9914d184fe757b7542fcddb3). The local branch and `origin/main` were aligned before publication, and the remote commit was confirmed with `gh api repos/rmaceda7-coder/WebAnalizerTool/commits/main`.
+- [Verify run 40941709079](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/runs/40941709079) passed for that exact implementation commit: Node.js 22 MCP/fixture tests, Windows PowerShell 5.1 checks, and PowerShell 7 checks. Observed with `gh run watch 40941709079 --exit-status --interval 10`, which exited successfully. This result does not establish live browser/remote-server compatibility; it is recorded in a subsequent documentation-only commit.
 
 ## WAT-005 — Web test automation purpose and QA-focused examples
 
