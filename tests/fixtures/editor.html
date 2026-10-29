@@ -17,21 +17,21 @@
 </head>
 <body>
   <h1>Disposable editor fixture</h1>
-  <p>This local page stores code only in memory. It has no execution, submission, or grading action.
+  <p>This local page stores test code only in memory. It has no test-execution or form-submission action.
     Reloading discards edits. Use synthetic code and clipboard data for manual testing.</p>
-  <p id="exercise"></p>
+  <p id="scenario"></p>
   <div class="editors">
     <div>
       <label for="editor">Disposable code editor</label>
-      <textarea id="editor" spellcheck="false" autocomplete="off">SELECT 'caf&#233;', '&#28450;&#23383;', '[quoted]';
-SELECT 1;</textarea>
+      <textarea id="editor" spellcheck="false" autocomplete="off">await expect(page.getByRole('status')).toHaveText('Ready');
+await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled();</textarea>
     </div>
     <div id="extra-editor" hidden></div>
   </div>
   <p>
     <button id="reset" type="button">Reset sample</button>
     <button id="clear" type="button">Clear editor</button>
-    <button id="change" type="button">Change exercise URL</button>
+    <button id="change" type="button">Change test scenario URL</button>
     <button id="focus-sink" type="button">Focus target outside editor</button>
   </p>
   <fieldset>
@@ -45,18 +45,18 @@ SELECT 1;</textarea>
     const editor = document.getElementById('editor');
     const sample = editor.value;
     const control = id => document.getElementById(id);
-    const showExercise = () => {
-      control('exercise').textContent = `Exercise identity: ${new URL(location.href).searchParams.get('exercise') ?? '1'}`;
+    const showScenario = () => {
+      control('scenario').textContent = `Test scenario: ${new URL(location.href).searchParams.get('scenario') ?? '1'}`;
     };
-    showExercise();
-    window.addEventListener('popstate', showExercise);
+    showScenario();
+    window.addEventListener('popstate', showScenario);
     control('reset').addEventListener('click', () => { editor.value = sample; });
     control('clear').addEventListener('click', () => { editor.value = ''; });
     control('change').addEventListener('click', () => {
       const url = new URL(location.href);
-      url.searchParams.set('exercise', url.searchParams.get('exercise') === '2' ? '1' : '2');
+      url.searchParams.set('scenario', url.searchParams.get('scenario') === '2' ? '1' : '2');
       history.pushState(null, '', url);
-      showExercise();
+      showScenario();
     });
     control('duplicate').addEventListener('change', event => {
       const container = control('extra-editor');
@@ -65,7 +65,7 @@ SELECT 1;</textarea>
       if (event.target.checked) {
         const duplicate = document.createElement('textarea');
         duplicate.id = 'duplicate-editor';
-        duplicate.value = 'SELECT 99;';
+        duplicate.value = "await expect(page.getByRole('alert')).toBeVisible();";
         const label = document.createElement('label');
         label.htmlFor = duplicate.id;
         label.textContent = 'Disposable code editor';
@@ -82,7 +82,7 @@ SELECT 1;</textarea>
     editor.addEventListener('paste', event => {
       if (control('bad-paste').checked) {
         event.preventDefault();
-        editor.setRangeText('-- simulated readback mismatch --', editor.selectionStart, editor.selectionEnd, 'end');
+        editor.setRangeText('// simulated readback mismatch', editor.selectionStart, editor.selectionEnd, 'end');
         editor.dispatchEvent(new Event('input', { bubbles: true }));
       }
     });

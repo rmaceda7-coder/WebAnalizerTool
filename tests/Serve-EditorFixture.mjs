@@ -27,7 +27,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const server = await createEditorFixtureServer();
   server.on('error', error => { console.error(error.message); process.exitCode = 1; });
   server.listen(0, '127.0.0.1', () => {
-    console.log(`Disposable editor: http://127.0.0.1:${server.address().port}/editor?exercise=1`);
+    console.log(`Disposable editor: http://127.0.0.1:${server.address().port}/editor?scenario=1`);
     console.log('Open this URL manually in Chrome on the primary monitor. Stop the server with Ctrl+C.');
   });
 }

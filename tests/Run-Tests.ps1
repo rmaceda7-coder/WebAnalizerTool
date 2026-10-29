@@ -51,14 +51,14 @@ Assert-Throws { Select-PrimaryBrowserWindow -Windows @($secondary, $terminal) } 
 Assert-Throws { Select-PrimaryBrowserWindow -Windows @() } 'Missing browser fails explicitly'
 
 $context = [pscustomobject]@{
-    WindowHandle = 7; Url = 'https://example.test/Exercise?question=1'
+    WindowHandle = 7; Url = 'https://example.test/Checkout?scenario=1'
     Monitor = [pscustomobject]@{ IsPrimary = $true }
 }
 $null = Assert-ExpectedContext -Context $context -ExpectedWindowHandle 7 -ExpectedUrl $context.Url
 Assert-True $true 'Matching context is accepted'
 Assert-Throws { Assert-ExpectedContext -Context $context -ExpectedWindowHandle 6 -ExpectedUrl $context.Url } 'Window switch invalidates context'
-Assert-Throws { Assert-ExpectedContext -Context $context -ExpectedWindowHandle 7 -ExpectedUrl 'https://example.test/Exercise?question=2' } 'Exercise switch invalidates context'
-Assert-Throws { Assert-ExpectedContext -Context $context -ExpectedWindowHandle 7 -ExpectedUrl 'https://example.test/exercise?question=1' } 'URL path comparison is case-sensitive'
+Assert-Throws { Assert-ExpectedContext -Context $context -ExpectedWindowHandle 7 -ExpectedUrl 'https://example.test/Checkout?scenario=2' } 'Test scenario switch invalidates context'
+Assert-Throws { Assert-ExpectedContext -Context $context -ExpectedWindowHandle 7 -ExpectedUrl 'https://example.test/checkout?scenario=1' } 'URL path comparison is case-sensitive'
 $context.Monitor.IsPrimary = $false
 Assert-Throws { Assert-ExpectedContext -Context $context -ExpectedWindowHandle 7 -ExpectedUrl $context.Url } 'Secondary-display context is rejected'
 

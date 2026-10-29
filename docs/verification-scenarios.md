@@ -10,7 +10,7 @@ node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs
 
 Checks cover primary-monitor priority, Z-order, excluded windows, missing browser behavior, stale URL/window rejection, exact URL comparison, normalized hashes, PowerShell syntax, agent/skill configuration, and native C# compilation. Editor-transfer tests inject all desktop operations and cover capture/replacement, Unicode/multiline code, changed fingerprints, stale context at each binding, ambiguous editors, clipboard snapshot/set/read/restore failures, refused/lost focus, unsupported copy, confirmed/unconfirmed empty editors, delayed copy, paste failure, and readback mismatch. They do not read actual page contents or touch the clipboard.
 
-Node tests exercise the MCP transport and the fixture HTTP server. The fixture server test listens briefly on loopback but never opens a browser or invokes the desktop adapter. Both PowerShell suites and both Node test files run in CI.
+Node tests cover the MCP transport and the fixture HTTP server. The fixture server test listens briefly on loopback but never opens a browser or invokes the desktop adapter. Both PowerShell suites and both Node test files run in CI.
 
 ## Optional passive smoke check
 
@@ -18,7 +18,7 @@ With Chrome open on the primary display, run `scripts/Get-PrimaryBrowserContext.
 
 ## Opt-in manual editor checks
 
-Perform these only on an explicitly authorized disposable editor. The user should expect Chrome to receive focus and clipboard contents to be temporarily replaced. Do not use production forms or submit exercise answers as tests.
+Perform these only on an explicitly authorized disposable editor. The user should expect Chrome to receive focus and clipboard contents to be temporarily replaced. Use synthetic test code rather than production forms or real application records.
 
 | Scenario | Expected evidence |
 |---|---|
@@ -33,14 +33,14 @@ Perform these only on an explicitly authorized disposable editor. The user shoul
 | Empty editor unsupported by accessibility/copy | Explicit failure, never guessed as blank |
 | User steals focus during transfer | Stop at next focus guard; report actual state |
 | Ordinary text in clipboard before edit | Text restored afterward; `ClipboardRestored=True` |
-| Write succeeds | New code visible; `Executed=False`; no result/completion change |
-| SQL Practice Online Run requested without approval | Agent pauses and asks before action |
+| Write succeeds | New test code visible; `Executed=False`; no test run or application-state change |
+| Test action would save data or submit a form without approval | Agent pauses and asks before action |
 | Approval followed by code revision | Old approval not reused |
 | Unverified Run semantics | Agent asks instead of assuming independence |
 
 ### Disposable local editor fixture
 
-This is an **opt-in manual desktop check**, separate from `Run-Tests.ps1` and CI. It may focus Chrome and temporarily replace the clipboard. Use synthetic code and ordinary disposable clipboard text. No step runs, submits, or grades code.
+This is an **opt-in manual desktop check**, separate from `Run-Tests.ps1` and CI. It may focus Chrome and temporarily replace the clipboard. Use synthetic test code and ordinary disposable clipboard text. No step runs tests or submits application data.
 
 1. From the project root, start the dependency-free local server:
 
@@ -76,7 +76,7 @@ This is an **opt-in manual desktop check**, separate from `Run-Tests.ps1` and CI
 
    ```powershell
    $result = Set-BrowserEditor @binding -EditorName 'Disposable code editor' `
-     -ExpectedContentSha256 $before.ContentSha256 -Code "SELECT 'fixture';`nSELECT 2;"
+     -ExpectedContentSha256 $before.ContentSha256 -Code "await expect(page.getByRole('status')).toHaveText('Ready');"
    $result | Select-Object Text, PreviousText, Written, Verified, Executed, ClipboardRestored
    ```
 
@@ -87,7 +87,7 @@ This is an **opt-in manual desktop check**, separate from `Run-Tests.ps1` and CI
    | Fixture action | Expected observation |
    |---|---|
    | Capture code, then manually edit it before replacement | Old fingerprint is rejected; manual edits remain |
-   | Capture binding, then click **Change exercise URL** | Old URL binding is rejected; rediscover before continuing |
+   | Capture binding, then click **Change test scenario URL** | Old URL binding is rejected; rediscover before continuing |
    | Enable duplicate editor | Both editors must be visible; ambiguity is rejected before input |
    | Enable **Block copying**, keeping nonempty code | Copy times out explicitly; no paste; clipboard restored |
    | Enable **Move focus outside the editor after the next copy** | Next focus guard rejects the transfer; no further keyboard input |
@@ -108,7 +108,7 @@ Initial local verification on Windows, 2026-10-28:
 - Passive native/UI Automation discovery: identified the existing Chrome selected page on the Windows primary display while another application held foreground focus. No browser tab was opened or navigated, and no editor was modified.
 - GitHub Actions: the Windows verification job passed both PowerShell steps on `main` and `feat/initial-project` after publication. Current status is available on the repository's Actions tab.
 
-Live editor transfer was not exercised against the user's current page during project setup. It is not covered by unattended CI. Do not interpret the manual scenarios listed above as already executed evidence.
+Live editor transfer was not tested against the user's current page during project setup. It is not covered by unattended CI. Do not interpret the manual scenarios listed above as already executed evidence.
 
 Visual extension verification on Windows, 2026-10-29:
 

@@ -4,6 +4,72 @@ This index records why changes were made, where they were implemented, and what 
 
 Every new implementation or behavior/policy change must add a dated entry here and update the relevant documentation. Link published commits/PRs or GitHub file history so the evidence remains traceable. An automated result does not establish live browser compatibility. GitHub Actions results belong to their exact commit and must be checked separately after publication.
 
+## WAT-005 — Web test automation purpose and QA-focused examples
+
+- **Date:** 2026-10-29
+- **Release:** 0.2.0 (unreleased)
+- **Baseline:** [0845b21](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/0845b21787f0a149011bca21437ad50bb2ea50ba), with the accompanying English-only documentation update tracked in WAT-004.
+- **Implementation history:** [agent history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/.opencode/agents/web-analyzer.md), [fixture history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/tests/fixtures/editor.html), and [this record's history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/docs/implementation-history.md)
+
+### Requirement and changes
+
+The user clarified that the primary objective is automated web testing. Reframed documentation and agent guidance around inspecting applications, designing smoke/regression/validation/accessibility scenarios, preparing automation code, and comparing expected versus observed behavior. Replaced answer-selection and academic-task examples with login validation, dashboard checks, data-grid scenarios, and Playwright assertions.
+
+The capability boundary is explicit: the shipped runtime implements passive page inspection and guarded editor transfers. General web interaction and end-to-end test execution need separate verified capabilities. Prepared code and observed UI state do not establish an executed or passed test. State-changing action approval is scoped to the current test code/action plan, environment, and page.
+
+Updated the disposable fixture to show test assertions and identify a test scenario through the `scenario` query parameter. The server's printed URL, HTTP test URL, synthetic MCP binding, PowerShell context tests, and manual procedure now use application/test-scenario terminology. Historical records retain their original verification results; their example terminology is aligned with the current project purpose.
+
+### Affected files
+
+| Area | Files |
+|---|---|
+| Purpose, action controls, and contributor guidance | [`README.md`](../README.md), [`AGENTS.md`](../AGENTS.md), [`CONTRIBUTING.md`](../CONTRIBUTING.md) |
+| Agent and workflow instructions | [`.opencode/agents/web-analyzer.md`](../.opencode/agents/web-analyzer.md), [page-analysis skill](../.opencode/skills/web-page-analysis/SKILL.md), [code-editor skill](../.opencode/skills/browser-code-editor/SKILL.md) |
+| QA walkthrough and capability boundaries | [`docs/usage.md`](usage.md), [`docs/architecture.md`](architecture.md), [`docs/roadmap.md`](roadmap.md), [`docs/verification-scenarios.md`](verification-scenarios.md) |
+| Fixture and synthetic bindings | [`tests/fixtures/editor.html`](../tests/fixtures/editor.html), [`tests/Serve-EditorFixture.mjs`](../tests/Serve-EditorFixture.mjs), [`tests/editor-fixture.test.mjs`](../tests/editor-fixture.test.mjs), [`tests/browser-vision-mcp.test.mjs`](../tests/browser-vision-mcp.test.mjs), [`tests/Run-Tests.ps1`](../tests/Run-Tests.ps1) |
+| Change evidence | [`CHANGELOG.md`](../CHANGELOG.md), this implementation record |
+
+### Verification and pending checks
+
+- `powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File tests/Run-Tests.ps1`: all 118 checks passed, including the renamed test-scenario URL bindings.
+- `pwsh.exe -NoProfile -STA -File tests/Run-Tests.ps1`: all 118 checks passed.
+- `node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs`: all 6 tests passed with the updated fixture and MCP binding examples.
+- `opencode agent list`: completed successfully and listed `web-analyzer (primary)` with the project-local skill directories.
+- `git diff --check`: passed. A terminology review confirmed that examples now use web test scenarios; the targeted documentation-language scan returned no Spanish text.
+- Restart OpenCode to load the updated agent and skill instructions. Live application interactions, test-runner execution, and the updated fixture's desktop scenarios have not been performed by this change.
+- The user authorized committing and pushing WAT-005 together with WAT-004 to `main`. The file-history links identify the publication revision; hosted verification must be checked for that exact commit.
+
+## WAT-004 — English-only documentation and guidelines
+
+- **Date:** 2026-10-29
+- **Release:** 0.2.0 (unreleased)
+- **Baseline:** [0845b21](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/0845b21787f0a149011bca21437ad50bb2ea50ba)
+- **Implementation history:** [README history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/README.md) and [this record's history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/docs/implementation-history.md)
+
+### Requirement and changes
+
+The user identified Spanish text in the README and requested that all documentation and guidelines be in English. Reviewed the tracked Markdown documentation, including GitHub templates and project-local agent/skill instructions. Translated the remaining README example prompts and creator/contact labels. Replaced the operating contract's non-English example phrases with English guidance that applies regardless of the request language.
+
+Established English as the required language for documentation and guidelines, including headings, explanatory text, example prompts, templates, agent/skill instructions, changelogs, and implementation records.
+
+### Affected files
+
+- [`README.md`](../README.md): English examples and attribution labels; explicit documentation-language statement.
+- [`AGENTS.md`](../AGENTS.md): English-only documentation requirement and English wording for language-independent browser targeting.
+- [`CONTRIBUTING.md`](../CONTRIBUTING.md): documentation-language requirement for contributors.
+- [`CHANGELOG.md`](../CHANGELOG.md): release summary of the documentation update.
+- This implementation record: requirement, scope, evidence, and publication traceability.
+
+### Verification and publication
+
+- Reviewed the tracked Markdown documentation, templates, and agent/skill instructions. A targeted search for the remaining Spanish labels, example phrases, and accented characters returned no matches after translation.
+- `powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File tests/Run-Tests.ps1`: all 118 checks passed.
+- `pwsh.exe -NoProfile -STA -File tests/Run-Tests.ps1`: all 118 checks passed.
+- `node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs`: all 6 tests passed.
+- `git diff --check`: passed.
+- No live browser/editor checks were performed for this documentation-only change; the pending desktop scenarios remain recorded in WAT-003.
+- The user authorized publication together with WAT-005 on `main`. The file-history links identify the publication revision.
+
 ## WAT-003 — Editor-transfer reliability coverage and publication traceability
 
 - **Date:** 2026-10-29
@@ -21,7 +87,7 @@ Implemented:
 - Private injectable desktop operations for binding, clipboard snapshot/restore, focus, keyboard input, polling, and accessibility confirmation of an empty editor. Public editor commands select the real operations; automated tests use an entirely simulated desktop.
 - Transfer tests covering capture/replacement, changed fingerprints, stale target bindings before/after replacement, ambiguous editors, clipboard failures, refused/lost focus, unsupported/delayed copy, empty editor/replacement behavior, Unicode/multiline code, paste failure, and readback mismatch.
 - Assertions that failures do not trigger blind retries/rollback and that clipboard restoration is attempted after a successful snapshot, with restoration failure reported distinctly.
-- A disposable HTML editor and opt-in loopback server with simulations for duplicate editors, blocked copy, focus loss, changed exercise URL, and corrupted paste. The server does not launch a browser and serves only the fixture route.
+- A disposable HTML editor and opt-in loopback server with simulations for duplicate editors, blocked copy, focus loss, changed URL binding, and corrupted paste. The server does not launch a browser and serves only the fixture route.
 - CI coverage for the fixture server alongside existing MCP and PowerShell checks.
 - Publication of the latest operating-contract clarifications: passive discovery must not open connection pages or launch a substitute browser, and writing code does not authorize submission/completion-triggering execution. These are agent policy clarifications, not a new execution adapter or sandbox.
 - An ongoing requirement to document implementations, affected files, verification evidence, and pending checks with each authorized GitHub update. Contributor guidance now matches the project's `main` publication contract.

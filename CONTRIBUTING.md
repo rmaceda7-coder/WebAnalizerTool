@@ -14,12 +14,16 @@ No third-party test packages are required. Node.js 22+ is needed for the MCP and
 
 ## Changes
 
+All project documentation and guidelines must be written in English. Use English for headings, explanatory text, example prompts, templates, agent/skill instructions, changelog entries, and implementation records.
+
+Frame examples and feature proposals around web test automation: smoke/regression coverage, form validation, accessibility observations, and user-workflow tests. Document whether a capability inspects state, prepares code, performs an interaction, or executes assertions; do not imply a test ran from generated code alone.
+
 1. Use `main` for this project's work and authorized GitHub updates. Create or publish another branch only when explicitly requested by the user. Inspect local and remote history before publishing.
 2. Keep pure selection/context/hash logic testable without a desktop.
 3. Keep OS interop separate from agent instructions and CLI wrappers.
 4. Update `CHANGELOG.md`, relevant usage/architecture documentation, and the [implementation history](docs/implementation-history.md) for every implementation or behavior/policy change.
 5. Verify desktop changes using the opt-in [manual scenarios](docs/verification-scenarios.md).
-6. Inspect `git status` and `git diff`. Never include captured page contents, personal browser profiles, clipboard data, tokens, or real exercise drafts.
+6. Inspect `git status` and `git diff`. Never include captured page contents, personal browser profiles, clipboard data, tokens, or private test drafts.
 7. Ask for GitHub synchronization approval after verification. Commit and push only when authorized; create a pull request only when explicitly requested. Publish the implementation and its traceability documentation together.
 
 Use concise imperative commit subjects with optional conventional prefixes (`feat:`, `fix:`, `docs:`, `test:`). Keep changes scoped.

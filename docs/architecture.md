@@ -1,5 +1,9 @@
 # Architecture
 
+## Web testing scope
+
+The project supports web test automation through application inspection, scenario/assertion design, evidence collection, and guarded preparation of test code. The Windows adapter implements discovery, accessibility reading, viewport capture, and editor transfer. General clicks, form entry, navigation, and end-to-end execution require separately implemented, verified capabilities. Reports must distinguish proposed scenarios, prepared scripts, observed UI state, and executed assertion results.
+
 ## Layers
 
 1. **Operating contract:** AGENTS.md records monitor selection, passive discovery, and approval policy.
@@ -13,7 +17,7 @@
 
 Native EnumWindows supplies top-to-bottom Z-order. MonitorFromWindow/GetMonitorInfo identifies the monitor with the greatest overlap for each window. Only primary-monitor Chrome window candidates are retained. Minimized, cloaked, invisible, and untitled windows are rejected. Global foreground focus does not override this policy.
 
-UI Automation must expose exactly one visible HTTP(S) Document. Its URL, native window handle, monitor identity, and page title form the reported context. Commands re-resolve and compare URL/handle before operating and again after reading/transferring. A changed URL (including path case or exercise query) invalidates the binding.
+UI Automation must expose exactly one visible HTTP(S) Document. Its URL, native window handle, monitor identity, and page title form the reported context. Commands re-resolve and compare URL/handle before operating and again after reading/transferring. A changed URL (including path case or test-scenario query parameters) invalidates the binding.
 
 The binding is not a stable browser tab ID: two tabs can share the same URL, or a page may mutate without URL changes. The content fingerprint additionally protects editor writes. A future CDP/extension adapter may add stable tab/document IDs, but only if it can attach without side-effect navigation.
 
@@ -46,11 +50,11 @@ No automatic execution occurs. Focus changes are deliberate only during editor o
 
 `New-EditorDesktop` supplies private scriptblock operations for page/editor binding, clipboard snapshot/restore, focus checks, keyboard input, clipboard text, polling delay, and accessibility confirmation of emptiness. `Invoke-EditorTransfer` and `Copy-EditorText` run the same orchestration with either those operations or a fully simulated desktop. Public editor commands always select the real operations; injection is not exposed as a CLI option or a new browser adapter.
 
-`tests/EditorTransfer.Tests.ps1` replaces every desktop operation, including delays, and exercises real transfer orchestration with an in-memory editor/clipboard. These tests verify guard ordering, failure propagation, bounded polling, restoration attempts, and no blind retry/rollback. They do not prove Windows focus behavior, clipboard format fidelity, Chrome accessibility support, or keyboard delivery. The opt-in [local editor procedure](verification-scenarios.md#disposable-local-editor-fixture) covers the separate desktop boundary.
+`tests/EditorTransfer.Tests.ps1` replaces every desktop operation, including delays, and runs real transfer orchestration with an in-memory editor/clipboard. These tests verify guard ordering, failure propagation, bounded polling, restoration attempts, and no blind retry/rollback. They do not prove Windows focus behavior, clipboard format fidelity, Chrome accessibility support, or keyboard delivery. The opt-in [local editor procedure](verification-scenarios.md#disposable-local-editor-fixture) covers the separate desktop boundary.
 
 ## Approval boundary
 
-The agent's behavioral contract distinguishes independent Run from delivery/completion. Bundled scripts expose no execution or submission capability. This is not a sandbox: inherited global tools can still perform actions, so their use must follow the contract. There is no persistent "approved" flag that can accidentally authorize a future code revision.
+The agent's behavioral contract distinguishes independently verified Run operations from form submission, persistent application changes, and workflow completion. Approval is scoped to the current test code/action plan, environment, and page. Bundled scripts expose no execution or submission capability. This is not a sandbox: inherited global tools can still perform actions, so their use must follow the contract. There is no persistent "approved" flag that can accidentally authorize a future code revision.
 
 ## Limitations
 
@@ -63,7 +67,7 @@ The agent's behavioral contract distinguishes independent Run from delivery/comp
 - Focus and clipboard calls are desktop-wide and non-atomic; user activity can race with them. Do not interact with the desktop during transfers.
 - Materialized clipboard snapshots preserve ordinary text/files/images where supported; delayed rendering, app-private formats, clipboard managers/history/cloud sync may not be fully reversible. A successful API restore does not guarantee every external clipboard consumer is unchanged.
 - Clipboard or editor failures do not trigger blind retries or automatic editor rollback.
-- URL/handle checks cannot distinguish all same-URL tab switches or in-place exercise changes.
+- URL/handle checks cannot distinguish all same-URL tab switches or in-place application-state changes.
 - Automated CI checks policy/logic/syntax/compilation, not live desktop automation or the OpenCode runtime loader.
 
 ## Extension contract

@@ -1,11 +1,11 @@
 ---
 name: browser-code-editor
-description: Reads and edits code in the identified browser editor, verifies text, and pauses for user review before submit or completion-triggering execution.
+description: Prepares web automation test code in the identified browser editor, captures existing text, verifies replacements, and pauses for review before execution or state-changing actions.
 ---
 
 # Edit, verify, and request review
 
-1. Identify and report the current target using `active-browser-context`. Analyze the statement using `web-page-analysis`.
+1. Identify and report the current target using `active-browser-context`. Analyze the application and test requirements using `web-page-analysis`.
 2. Editing tools require an editing request; desktop capture focuses the editor and temporarily uses the clipboard. Capture current code before designing a replacement:
 
    ```powershell
@@ -13,22 +13,22 @@ description: Reads and edits code in the identified browser editor, verifies tex
    ```
 
    If the name is unknown, inspect `Editors` from `Read-BrowserPage.ps1`. Multiple matching editors are an error, never "take first".
-3. Explain the intended change. Keep existing useful work. Put the intended code in a UTF-8 file outside tracked source, such as `artifacts/query.sql`. Never include credentials.
+3. Explain the intended test scenarios, preconditions, and assertions. Keep existing useful work. Put the intended test code in a UTF-8 file outside tracked source, such as `artifacts/login-validation.spec.js`. Confirm the intended test framework and target environment rather than assuming the page provides a runner. Never include credentials.
 4. Write using an exact URL, window handle, accessible name, and a SHA-256 precondition from the capture result:
 
    ```powershell
-   powershell.exe -NoProfile -STA -File scripts/Set-BrowserEditor.ps1 -ExpectedUrl '<URL>' -ExpectedWindowHandle <handle> -EditorName '<exact name>' -ExpectedContentSha256 '<capture ContentSha256>' -CodePath artifacts/query.sql
+   powershell.exe -NoProfile -STA -File scripts/Set-BrowserEditor.ps1 -ExpectedUrl '<URL>' -ExpectedWindowHandle <handle> -EditorName '<exact name>' -ExpectedContentSha256 '<capture ContentSha256>' -CodePath artifacts/login-validation.spec.js
    ```
 
 5. Check `Verified`, `ContentSha256`, `PreviousContentSha256`, and `ClipboardRestored`. A failed readback is a failure, not a completed edit. Do not blindly retry after failure; inspect current state first. Preserve `PreviousText` locally only as needed; never commit it.
-6. Show the code and the reasoning. State explicitly that it has **not been run or submitted**. Ask for approval if execution would submit, grade-as-delivery, complete the exercise, or has unknown semantics.
+6. Show the test code and explain its assertions. State explicitly that it has **not been run**. Ask for approval if execution would submit a form, save application data, finalize a workflow, or has unknown effects.
 
 ## Execution policy
 
 - The bundled tooling has no execution/submit entry point. There is no automatic Ctrl+Enter.
-- User approval applies to the current code, exercise, and page only. Any later edit invalidates it.
-- SQL Practice Online Run is known to mark exercises complete. Ask first, even if the exercise was already completed.
-- Run is allowed without approval only with affirmative evidence that it does not submit or complete an exercise. A label or guessed keyboard shortcut is insufficient.
+- User approval applies to the current test code/action plan, environment, and page only. Any later edit invalidates it.
+- Test steps that submit forms, save records, or finalize workflows require explicit approval of their effects on the identified application.
+- Run is allowed without approval only with affirmative evidence that it does not submit forms, change persistent application data, or finalize a workflow. A label or guessed keyboard shortcut is insufficient.
 - After approval, use a verified same-page transport if available. If the transport cannot do this without opening a connection page, explain the limitation.
 
 ## Adapter limitations

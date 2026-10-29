@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createHandler } from '../scripts/browser-vision-mcp.mjs';
 
 const call = (name, args = {}) => ({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } });
-const bound = { expectedUrl: 'https://example.test/exercise?a=1&b=2', expectedWindowHandle: 123 };
+const bound = { expectedUrl: 'https://example.test/dashboard?scenario=1&view=summary', expectedWindowHandle: 123 };
 
 test('MCP lifecycle and discovery expose only read-only tools', async () => {
   const handle = createHandler();

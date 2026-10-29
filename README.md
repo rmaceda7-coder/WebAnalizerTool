@@ -1,17 +1,20 @@
 # WebAnalizerTool — Web Analyzer and Acting Tool
 
-Analyze the existing Chrome page on the **primary Windows monitor**, edit browser code editors, and keep the user in control of submission.
+An automation foundation for **web application testing**: inspect the existing Chrome page on the **primary Windows monitor**, compare observed UI behavior with test expectations, and prepare test code with verified editor transfers.
 
 [![Verify](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/workflows/verify.yml)
 
 ## What it does
 
+- Supports QA workflows: analyze application UI, identify smoke/regression scenarios, draft assertions, and report expected versus observed behavior.
 - Identifies the foremost eligible Chrome window on the primary monitor, even when a terminal on another monitor has keyboard focus.
 - Reads the selected page through Windows UI Automation without opening a browser, welcome tab, or connection page.
 - Analyzes visible image-based tables and diagrams through a project-local MCP that returns the page viewport directly as PNG image content, without intermediate screenshot files.
 - Captures existing editor text, checks its fingerprint before replacing it, and verifies the resulting code by clipboard readback.
 - Provides an OpenCode primary agent and three focused workflow skills.
-- Leaves the code for review. **No bundled command executes code or submits an exercise.**
+- Leaves prepared test code for review. **Bundled commands expose no test runner, form-submit action, or record-saving action.**
+
+The current adapter provides page discovery, accessibility reading, viewport capture, and guarded code-editor transfers. General clicking, form filling, navigation, and end-to-end test execution require separately implemented and verified capabilities. Proposed test scenarios and generated scripts are not evidence that a test has run.
 
 **Initial support:** Windows 10/11, an existing Chrome session, and accessible code editors that implement Ctrl+A/C/V reliably. Other browsers, secondary-display targeting, remote desktops, and arbitrary editors are not yet supported adapters. See [limitations](docs/architecture.md#limitations).
 
@@ -44,25 +47,25 @@ This is a project-local installation. It does not modify your global OpenCode co
 
 ### Ask the agent
 
-> Analiza la pagina activa de Chrome en el monitor principal.
+> Inspect the login page on the primary monitor and identify validation, accessibility, and smoke-test scenarios.
 
-> Analiza la imagen del ejercicio actual y comparte la opcion correcta por este chat.
+> Compare the visible dashboard status indicators with the expected behavior and report any discrepancies with supporting evidence.
 
-> Lee el enunciado y deja una consulta en el editor para mi revision. No la ejecutes.
+> Prepare a Playwright test for required-field validation on the login form and leave the test code in the identified editor for my review. Do not run it.
 
-The agent reports the page identity, inspects requirements, captures existing code, writes and verifies a solution, then pauses when approval is required. See [the walkthrough](docs/usage.md).
+The agent reports the page identity, inspects the application against test requirements, identifies assertions and defects, and prepares requested test code with readback verification. It distinguishes proposed tests, observed results, and actual execution. See [the walkthrough](docs/usage.md).
 
-## Submission rules
+## Test actions and execution controls
 
 | Action | Behavior |
 |---|---|
 | Identify/read primary-display page | Passive; no navigation, focus change, or clipboard access |
 | Capture or edit browser code after an editing request | May focus Chrome and temporarily use clipboard; attempts restoration |
-| Run proven independent of submission/completion | Agent may run if a verified same-page transport is available |
-| Submit, completion-triggering Run, or unknown Run | Ask for explicit approval of the current code first |
-| Change code after approval | Request new approval before submission |
+| Run verified as independent of form submission, persistent changes, and workflow completion | Agent may run if a verified same-page transport is available |
+| Submit forms, save application data, complete a workflow, or use Run with unknown effects | Ask for explicit approval of the current test code/action plan first |
+| Change test code, action plan, or target after approval | Request new approval before the affected action |
 
-**SQL Practice Online:** Run was observed to complete exercises, so approval is required. A button named Run is not proof of a non-submitting operation.
+A button named Run or Test does not establish its effects. Verify the operation and target environment before execution; the bundled adapter does not provide a test runner.
 
 ## CLI commands
 
@@ -74,7 +77,7 @@ powershell.exe -NoProfile -STA -File scripts/Get-PrimaryBrowserContext.ps1
 
 # Use the exact values returned above, not these example placeholders.
 powershell.exe -NoProfile -STA -File scripts/Read-BrowserPage.ps1 `
-  -ExpectedUrl 'https://example.test/exercise' -ExpectedWindowHandle 12345
+  -ExpectedUrl 'https://example.test/login' -ExpectedWindowHandle 12345
 ```
 
 For editor capture and guarded writes, see [usage](docs/usage.md). Output is JSON. Failures terminate with a nonzero script exit. Browser/page output may contain private data; keep it out of Git.
@@ -119,6 +122,8 @@ AUTHORS.md             Creator signature and contact publication status
 
 ## Documentation
 
+All project documentation and guidelines are maintained in English.
+
 - [Installation and usage](docs/usage.md)
 - [Architecture and extension points](docs/architecture.md)
 - [Verification scenarios](docs/verification-scenarios.md)
@@ -128,15 +133,15 @@ AUTHORS.md             Creator signature and contact publication status
 - [Changelog](CHANGELOG.md)
 - [Implementation history and verification traceability](docs/implementation-history.md)
 
-## Creator / Creador
+## Creator
 
 **Ramiro Maceda**
 
 **Senior Software Quality Assurance Engineer**
 
-- Phone / Telefono: [+591 60356760](tel:+59160356760)
+- Phone: [+591 60356760](tel:+59160356760)
 - LinkedIn: [Ramiro Maceda Toranzos](https://www.linkedin.com/in/ramiro-maceda-toranzos-928746214)
-- Email / Correo: [rmaceda7@gmail.com](mailto:rmaceda7@gmail.com)
+- Email: [rmaceda7@gmail.com](mailto:rmaceda7@gmail.com)
 - GitHub: [rmaceda7-coder](https://github.com/rmaceda7-coder)
 - Repository: [WebAnalizerTool](https://github.com/rmaceda7-coder/WebAnalizerTool)
 

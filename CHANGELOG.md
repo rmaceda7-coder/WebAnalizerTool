@@ -4,6 +4,8 @@ Notable changes are recorded here. Versions follow Semantic Versioning once rele
 
 ## 0.2.0 — Unreleased
 
+- Reframed project purpose, agent/skill guidance, examples, and fixture terminology around web test automation, including smoke/regression scenarios, validation assertions, and expected-versus-observed reporting. Documented the current inspection/editor-transfer capability boundary separately from future interaction and test-runner integrations.
+- Standardized documentation in English: translated README example prompts and creator labels, replaced non-English operating-contract examples with English guidance, and established an English-only documentation requirement.
 - Private injectable desktop operations and deterministic editor-transfer tests for guards, clipboard/focus failures, empty editors, Unicode, delayed copy, and readback mismatch.
 - Disposable local HTML editor, loopback-only opt-in fixture server, server tests, and a documented manual desktop procedure.
 - Expanded operating-contract guidance for passive attachment, connection-page limitations, and current-revision approval before submission/completion-triggering execution.
@@ -20,6 +22,6 @@ Notable changes are recorded here. Versions follow Semantic Versioning once rele
 - Guarded editor capture/write with URL, handle, and content preconditions.
 - Clipboard-based Unicode-safe paste and readback verification; no automatic execution.
 - OpenCode primary agent and three workflow skills.
-- Persistent review-before-submit rules, including SQL Practice Online behavior.
+- Persistent review-before-submit rules for actions with state-changing or unknown effects.
 - PowerShell 5.1/7 checks and GitHub Actions workflow.
 - Installation, architecture, contributor, attribution, and verification documentation.
