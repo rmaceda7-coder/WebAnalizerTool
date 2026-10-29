@@ -285,4 +285,82 @@ function Set-BrowserEditor {
     Invoke-EditorTransfer @PSBoundParameters -Write
 }
 
-Export-ModuleMember -Function Get-PrimaryBrowserContext, Read-BrowserPage, Get-BrowserEditor, Set-BrowserEditor, Select-PrimaryBrowserWindow, Assert-ExpectedContext, Get-ContentSha256
+function Test-CaptureImage {
+    param([Parameter(Mandatory)]$Bitmap)
+    $colors = New-Object 'System.Collections.Generic.HashSet[int]'
+    for ($y = 0; $y -lt $Bitmap.Height; $y += [Math]::Max(1, [int]($Bitmap.Height / 40))) {
+        for ($x = 0; $x -lt $Bitmap.Width; $x += [Math]::Max(1, [int]($Bitmap.Width / 40))) {
+            $null = $colors.Add($Bitmap.GetPixel($x, $y).ToArgb())
+        }
+    }
+    return $colors.Count -ge 2
+}
+
+function Get-BrowserPageImage {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$ExpectedUrl,
+        [Parameter(Mandatory)][long]$ExpectedWindowHandle
+    )
+    $page = Get-BoundPage @PSBoundParameters
+    Add-Type -AssemblyName System.Drawing
+    $bitmap = $null; $viewport = $null; $graphics = $null; $stream = $null
+    # Use physical pixel bounds, restoring the calling thread's DPI context afterwards.
+    $oldDpi = [WebAnalyzer.NativeDesktop]::SetThreadDpiAwarenessContext([IntPtr]::new(-4))
+    try {
+        if ($oldDpi -eq [IntPtr]::Zero) { throw 'Cannot establish physical-pixel capture coordinates.' }
+        $rect = New-Object WebAnalyzer.NativeDesktop+WindowRect
+        if (-not [WebAnalyzer.NativeDesktop]::GetWindowRect([IntPtr]$ExpectedWindowHandle, [ref]$rect)) {
+            throw 'Cannot read Chrome window bounds.'
+        }
+        $width = $rect.Right - $rect.Left; $height = $rect.Bottom - $rect.Top
+        if ($width -lt 16 -or $height -lt 16 -or ([long]$width * $height) -gt 40000000) {
+            throw 'Invalid or oversized Chrome capture bounds.'
+        }
+        $bitmap = New-Object System.Drawing.Bitmap $width, $height
+        $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+        $dc = $graphics.GetHdc()
+        try {
+            # PW_RENDERFULLCONTENT captures Chrome itself, not the desktop/overlapping terminal.
+            $captured = [WebAnalyzer.NativeDesktop]::PrintWindow([IntPtr]$ExpectedWindowHandle, $dc, 2)
+        } finally { $graphics.ReleaseHdc($dc) }
+        if (-not $captured) { throw 'Chrome did not provide a window image. No desktop fallback was used.' }
+        # UIA bounds are physical screen pixels. Crop away tabs/address bar so their
+        # varied colors cannot disguise an entirely black/blank page surface.
+        $bounds = $page.Document.Current.BoundingRectangle
+        $crop = [System.Drawing.Rectangle]::FromLTRB(
+            [int][Math]::Ceiling($bounds.Left - $rect.Left), [int][Math]::Ceiling($bounds.Top - $rect.Top),
+            [int][Math]::Floor($bounds.Right - $rect.Left), [int][Math]::Floor($bounds.Bottom - $rect.Top))
+        if ($crop.Left -lt 0 -or $crop.Top -lt 0 -or $crop.Right -gt $width -or $crop.Bottom -gt $height -or
+            $crop.Width -lt 16 -or $crop.Height -lt 16) { throw 'Page viewport does not fit the Chrome capture bounds.' }
+        $viewport = $bitmap.Clone($crop, $bitmap.PixelFormat)
+        if (-not (Test-CaptureImage -Bitmap $viewport)) { throw 'Chrome returned a blank/uniform page image. Visual evidence is unavailable.' }
+        $afterPage = Get-BoundPage @PSBoundParameters
+        if ($afterPage.Document.Current.BoundingRectangle -ne $bounds) {
+            throw 'Page viewport changed during capture. Rediscover before retrying.'
+        }
+        $afterRect = New-Object WebAnalyzer.NativeDesktop+WindowRect
+        if (-not [WebAnalyzer.NativeDesktop]::GetWindowRect([IntPtr]$ExpectedWindowHandle, [ref]$afterRect) -or
+            $afterRect.Left -ne $rect.Left -or $afterRect.Top -ne $rect.Top -or
+            $afterRect.Right -ne $rect.Right -or $afterRect.Bottom -ne $rect.Bottom) {
+            throw 'Chrome window moved or resized during capture. Rediscover before retrying.'
+        }
+        $stream = New-Object IO.MemoryStream
+        $viewport.Save($stream, [System.Drawing.Imaging.ImageFormat]::Png)
+        return [pscustomobject]@{
+            Context = $page.Context
+            CapturedAtUtc = [DateTime]::UtcNow.ToString('o')
+            MimeType = 'image/png'; Width = $viewport.Width; Height = $viewport.Height
+            Scope = 'PageViewport'; Method = 'PrintWindow'
+            Data = [Convert]::ToBase64String($stream.ToArray())
+        }
+    } finally {
+        if ($null -ne $stream) { $stream.Dispose() }
+        if ($null -ne $viewport) { $viewport.Dispose() }
+        if ($null -ne $graphics) { $graphics.Dispose() }
+        if ($null -ne $bitmap) { $bitmap.Dispose() }
+        if ($oldDpi -ne [IntPtr]::Zero) { $null = [WebAnalyzer.NativeDesktop]::SetThreadDpiAwarenessContext($oldDpi) }
+    }
+}
+
+Export-ModuleMember -Function Get-PrimaryBrowserContext, Read-BrowserPage, Get-BrowserPageImage, Get-BrowserEditor, Set-BrowserEditor, Select-PrimaryBrowserWindow, Assert-ExpectedContext, Get-ContentSha256

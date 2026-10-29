@@ -17,6 +17,18 @@ UI Automation must expose exactly one visible HTTP(S) Document. Its URL, native 
 
 The binding is not a stable browser tab ID: two tabs can share the same URL, or a page may mutate without URL changes. The content fingerprint additionally protects editor writes. A future CDP/extension adapter may add stable tab/document IDs, but only if it can attach without side-effect navigation.
 
+## Visual capture
+
+The project-local `browser_vision` MCP (`scripts/browser-vision-mcp.mjs`) uses Node.js 22+ standard-library stdio JSON-RPC. It exposes discovery, accessibility reading, and capture only. Script paths resolve relative to the server file, not the client's working directory. OpenCode launches it from the project root via `opencode.json`; restarting OpenCode is required after configuration changes.
+
+`Get-BrowserPageImage.ps1` calls `Get-BrowserPageImage` in the Windows adapter. The operation binds the expected primary-monitor window/URL, temporarily sets the calling thread's DPI awareness for physical coordinates, calls `PrintWindow(PW_RENDERFULLCONTENT)`, and crops to the UI Automation Document bounds. It captures the Chrome surface even when another application overlaps it; it never uses desktop `CopyFromScreen`. It checks viewport/window bounds and target identity again, releases GDI resources, and restores thread DPI context in `finally`.
+
+PNG encoding and base64 transfer are in memory. The bridge translates the JSON result into MCP `image` content plus text metadata. It does not write screenshot files or print image data in logs. OpenCode sessions and the model provider may retain the image according to their configuration; in-memory capture does not imply zero downstream retention.
+
+Uniform/black viewport detection is a sampled-color heuristic. It deliberately excludes Chrome tabs/toolbars, whose varied colors could otherwise hide a black page surface. It cannot verify every region rendered correctly, identify the meaning of pixels, or detect all partially blank GPU content. A genuinely uniform page also fails this check. Captures are viewport-only, not full-page; there is no automatic scroll, focus, navigation, editor action, or secondary-monitor fallback. The existing same-URL tab/in-place-content identity limitations apply.
+
+Tool errors are returned explicitly without image content. Runtime process limits bound capture time and stdout size. The bridge requires Windows PowerShell 5.1 and uses execution-policy bypass only for that child process. The MCP supports newline-delimited stdio, not HTTP/network listening. MCP annotations declare read-only behavior; host permissions still apply.
+
 ## Editor transfer
 
 ```text

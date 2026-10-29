@@ -68,7 +68,7 @@ Assert-True ((Get-ContentSha256 -Text 'SELECT 1;') -ne (Get-ContentSha256 -Text 
 Assert-True ((Get-ContentSha256 -Text 'SELECT 1;') -ne (Get-ContentSha256 -Text 'SELECT 1; ')) 'Whitespace edits remain observable'
 
 $files = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object {
-    $_.Extension -in @('.ps1', '.psm1') -and $_.FullName -notmatch '[\\/]\.git[\\/]'
+    $_.Extension -in @('.ps1', '.psm1') -and $_.FullName -notmatch '[\\/](\.git|node_modules)[\\/]'
 })
 foreach ($file in $files) {
     $tokens = $null; $errors = $null
@@ -79,6 +79,9 @@ foreach ($file in $files) {
 $config = [IO.File]::ReadAllText((Join-Path $root 'opencode.json')) | ConvertFrom-Json
 Assert-True ($config.'$schema' -eq 'https://opencode.ai/config.json') 'OpenCode declares its official schema'
 Assert-True ($config.default_agent -eq 'web-analyzer') 'OpenCode selects the installed primary agent'
+Assert-True ($config.mcp.browser_vision.type -eq 'local' -and $config.mcp.browser_vision.enabled) 'Direct-image MCP is enabled project-locally'
+Assert-True ($config.mcp.browser_vision.command[0] -eq 'node' -and
+    (Test-Path -LiteralPath (Join-Path $root $config.mcp.browser_vision.command[1]))) 'MCP entry point exists'
 Assert-True (Test-Path -LiteralPath (Join-Path $root '.opencode/agents/web-analyzer.md')) 'Default agent file exists'
 $skills = @(Get-ChildItem -LiteralPath (Join-Path $root '.opencode/skills') -Directory)
 Assert-True ($skills.Count -eq 3) 'All three workflow skills are installed'
@@ -93,6 +96,18 @@ if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
         Add-Type -Path (Join-Path $root 'src/NativeDesktop.cs')
     }
     Assert-True ($null -ne ('WebAnalyzer.NativeDesktop' -as [type])) 'Native Windows adapter compiles'
+    Add-Type -AssemblyName System.Drawing
+    $bitmap = New-Object System.Drawing.Bitmap 100, 100
+    try {
+        $module = Get-Module WindowsBrowser
+        $usable = & $module { param($Image) Test-CaptureImage -Bitmap $Image } $bitmap
+        Assert-True (-not $usable) 'Uniform/black capture is rejected'
+        for ($y = 0; $y -lt 50; $y++) {
+            for ($x = 0; $x -lt 100; $x++) { $bitmap.SetPixel($x, $y, [System.Drawing.Color]::White) }
+        }
+        $usable = & $module { param($Image) Test-CaptureImage -Bitmap $Image } $bitmap
+        Assert-True $usable 'Nonuniform image provides visual evidence'
+    } finally { $bitmap.Dispose() }
 }
 
 Write-Output "All $script:count checks passed. No live browser/editor was changed."

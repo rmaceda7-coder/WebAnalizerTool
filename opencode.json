@@ -1,5 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "default_agent": "web-analyzer",
-  "instructions": ["AGENTS.md"]
+  "instructions": ["AGENTS.md"],
+  "mcp": {
+    "browser_vision": {
+      "type": "local",
+      "command": ["node", "./scripts/browser-vision-mcp.mjs"],
+      "enabled": true
+    }
+  }
 }

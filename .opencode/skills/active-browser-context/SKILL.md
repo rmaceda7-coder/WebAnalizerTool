@@ -6,7 +6,8 @@ description: Identifies the selected page of the existing Chrome window on the p
 # Identify the existing page
 
 1. From the project root run:
-   `powershell.exe -NoProfile -STA -File scripts/Get-PrimaryBrowserContext.ps1`
+    `powershell.exe -NoProfile -STA -File scripts/Get-PrimaryBrowserContext.ps1`
+   When available, prefer `browser_vision` MCP's `get_primary_browser_context`, which calls the same adapter without a shell prompt or file artifact.
 2. This enumerates monitors and eligible Chrome windows, selecting the primary-display Chrome window by Z-order. It does not use global foreground focus as the browser target.
 3. Check the returned `Monitor.IsPrimary`, `Selection`, `WindowHandle`, `Title`, and `Url`. The URL must be HTTP(S), and exactly one exposed visible Document must identify it.
 4. Tell the user which title and URL were identified, and that it is the primary monitor.

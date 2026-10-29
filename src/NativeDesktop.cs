@@ -31,7 +31,13 @@ namespace WebAnalyzer
         [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
         [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr handle);
+        [DllImport("user32.dll", SetLastError = true)] public static extern bool PrintWindow(IntPtr handle, IntPtr deviceContext, uint flags);
+        [DllImport("user32.dll", SetLastError = true)] public static extern bool GetWindowRect(IntPtr handle, out WindowRect rect);
+        [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr context);
         [DllImport("dwmapi.dll")] private static extern int DwmGetWindowAttribute(IntPtr handle, int attribute, out int value, int size);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WindowRect { public int Left, Top, Right, Bottom; }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct MonitorInfo
