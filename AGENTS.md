@@ -5,11 +5,18 @@
 - Always inspect the selected page of the foremost eligible Chrome window on the **Windows primary monitor (user's monitor 1)**. Global keyboard focus on a secondary monitor does not change the target.
 - Read actual Windows monitor and window information. An MCP-selected tab, remembered handle, previous URL, or terminal focus is not proof of the target.
 - Do not inspect another display unless the user explicitly names or requests it. The shipped adapter supports the primary display only; explain this limitation rather than silently falling back.
+- Do not open a browser, window, tab, connection/welcome page, or navigate an existing tab as a side effect of discovery or attachment. Open a new window or tab only when explicitly requested by the user.
 - If several Chrome windows exist, choose the highest window in desktop Z-order on that display. Ignore minimized, cloaked, untitled, and invisible windows. If none exists or the page is ambiguous, stop and explain.
 - Windows primary is authoritative; DISPLAY1 and Windows Settings display numbers are not interchangeable. Report the detected device, title, and URL.
 - Discovery must not open windows/tabs, navigate, launch Chrome, change focus, modify the clipboard, or establish an extension connection that opens a welcome page.
 - Never call the current Playwright extension transport just to discover the active tab: it may open connect.html. Never start Selenium as a substitute for attaching to the existing session.
 - Confirm the identified page to the user before analyzing its content or editing it.
+- Do not call Playwright extension tools to discover the active page if establishing their connection will launch `connect.html`. The installed extension transport currently does this automatically.
+- Do not start a Selenium browser as a substitute for attaching to the user's existing session.
+- If the available transport cannot identify and attach to that existing tab without opening a page, explain the transport limitation and resolve it before invoking browser tools. Do not repeatedly retry the same connection or treat its Welcome page as the user's target.
+- Preserve the selected page's URL, session, and browser focus during discovery. Report which page was identified before analyzing it.
+
+These rules also apply to Spanish requests such as "analiza la página activa" or "revisa la pestaña actual".
 
 ## Read, edit, review, execute
 
@@ -22,6 +29,8 @@
 7. Treat Run in SQL Practice Online as submission-equivalent: observed behavior completes exercises. Ask before using it.
 8. Approval is scoped to the current page and code revision. Editing code or changing the target invalidates earlier approval. "Try again", "analyze", or "write the query" is not submission approval.
 9. After an approved action, inspect actual output. Distinguish code written, execution succeeded, and accepted/completed. Never infer acceptance from lack of errors.
+10. Writing or changing code in a browser editor does not authorize execution/submission. Leave the code for review and ask before Submit, grading-as-delivery, exercise completion, or Run with unknown semantics. Approval applies only to the current code and page.
+11. Run without approval only when positively verified to be independent of submission/completion. SQL Practice Online Run was observed to complete exercises and requires approval.
 
 The shipped scripts deliberately expose **no Run/Submit operation**. Editor writing never sends Ctrl+Enter, clicks Run, or navigates. If execution is requested, first apply the policy above and verify that the available transport acts on the same page without opening another page.
 
@@ -40,9 +49,10 @@ The shipped scripts deliberately expose **no Run/Submit operation**. Editor writ
 
 - Use `main` for this project's work and authorized GitHub updates. Do not create or publish changes on another branch unless the user explicitly requests it. Inspect local and remote history before publication; the currently checked-out branch alone does not establish the intended destination.
 - After completing and verifying modifications or implementations, always ask the user whether to update this project's GitHub repository. Keep GitHub synchronization as an explicit closeout step so local work is not silently left unpublished. Do not commit, push, or create a pull request without the user's authorization; report pending synchronization until it is performed.
+- Document every new implementation and behavior/policy change in `CHANGELOG.md` and the relevant project documentation. Add a dated entry to `docs/implementation-history.md` with the reason, affected files, verification commands/results, pending manual checks, and GitHub commit/PR or file-history links. Publish this evidence with each authorized GitHub update for traceability; never imply an unperformed check passed.
 - Keep Windows-specific code in `src/WindowsBrowser.psm1`; public entry points belong in `scripts/`.
 - Run `powershell.exe -NoProfile -STA -File tests/Run-Tests.ps1` and the PowerShell 7 equivalent when available.
-- Run `node --test tests/browser-vision-mcp.test.mjs` for the direct-image MCP transport.
+- Run `node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs` for the direct-image MCP transport and local fixture server.
 - Never run live editor tests as unattended checks; use the documented opt-in manual procedure.
 - Do not introduce a new browser adapter without capability documentation and target-selection tests.
 - Never commit captured page content, real browser profiles, credentials, or clipboard data.

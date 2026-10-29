@@ -15,8 +15,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Test MCP image transport
-        run: node --test tests/browser-vision-mcp.test.mjs
+      - name: Test MCP image transport and local fixture server
+        run: node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs
       - name: Test with Windows PowerShell 5.1
         shell: powershell
         run: ./tests/Run-Tests.ps1

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Analyzer disposable editor fixture</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+    textarea { display: block; box-sizing: border-box; width: 100%; min-height: 14rem; font: 1rem monospace; margin: 1rem 0; }
+    .editors { display: flex; gap: 1rem; }
+    .editors > div { flex: 1; min-width: 0; }
+    fieldset { margin: 1rem 0; }
+    fieldset label { display: block; margin: .5rem 0; }
+    button { margin: .25rem; }
+    :focus-visible { outline: 3px solid #1769aa; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <h1>Disposable editor fixture</h1>
+  <p>This local page stores code only in memory. It has no execution, submission, or grading action.
+    Reloading discards edits. Use synthetic code and clipboard data for manual testing.</p>
+  <p id="exercise"></p>
+  <div class="editors">
+    <div>
+      <label for="editor">Disposable code editor</label>
+      <textarea id="editor" spellcheck="false" autocomplete="off">SELECT 'caf&#233;', '&#28450;&#23383;', '[quoted]';
+SELECT 1;</textarea>
+    </div>
+    <div id="extra-editor" hidden></div>
+  </div>
+  <p>
+    <button id="reset" type="button">Reset sample</button>
+    <button id="clear" type="button">Clear editor</button>
+    <button id="change" type="button">Change exercise URL</button>
+    <button id="focus-sink" type="button">Focus target outside editor</button>
+  </p>
+  <fieldset>
+    <legend>Opt-in failure simulations (off by default)</legend>
+    <label><input id="duplicate" type="checkbox"> Add another editor with the same accessible name</label>
+    <label><input id="block-copy" type="checkbox"> Block copying (leave clipboard sentinel untouched)</label>
+    <label><input id="bad-paste" type="checkbox"> Replace pasted text with a readback-mismatch marker</label>
+    <label><input id="lose-focus" type="checkbox"> Move focus outside the editor after the next copy</label>
+  </fieldset>
+  <script>
+    const editor = document.getElementById('editor');
+    const sample = editor.value;
+    const control = id => document.getElementById(id);
+    const showExercise = () => {
+      control('exercise').textContent = `Exercise identity: ${new URL(location.href).searchParams.get('exercise') ?? '1'}`;
+    };
+    showExercise();
+    window.addEventListener('popstate', showExercise);
+    control('reset').addEventListener('click', () => { editor.value = sample; });
+    control('clear').addEventListener('click', () => { editor.value = ''; });
+    control('change').addEventListener('click', () => {
+      const url = new URL(location.href);
+      url.searchParams.set('exercise', url.searchParams.get('exercise') === '2' ? '1' : '2');
+      history.pushState(null, '', url);
+      showExercise();
+    });
+    control('duplicate').addEventListener('change', event => {
+      const container = control('extra-editor');
+      container.replaceChildren();
+      container.hidden = !event.target.checked;
+      if (event.target.checked) {
+        const duplicate = document.createElement('textarea');
+        duplicate.id = 'duplicate-editor';
+        duplicate.value = 'SELECT 99;';
+        const label = document.createElement('label');
+        label.htmlFor = duplicate.id;
+        label.textContent = 'Disposable code editor';
+        container.append(label, duplicate);
+      }
+    });
+    editor.addEventListener('copy', event => {
+      if (control('block-copy').checked) event.preventDefault();
+      if (control('lose-focus').checked) {
+        control('lose-focus').checked = false;
+        setTimeout(() => control('focus-sink').focus(), 0);
+      }
+    });
+    editor.addEventListener('paste', event => {
+      if (control('bad-paste').checked) {
+        event.preventDefault();
+        editor.setRangeText('-- simulated readback mismatch --', editor.selectionStart, editor.selectionEnd, 'end');
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  </script>
+</body>
+</html>

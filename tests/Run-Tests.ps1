@@ -67,6 +67,8 @@ Assert-True ((Get-ContentSha256 -Text "SELECT`r`n1;") -eq (Get-ContentSha256 -Te
 Assert-True ((Get-ContentSha256 -Text 'SELECT 1;') -ne (Get-ContentSha256 -Text 'SELECT 2;')) 'Code changes invalidate content fingerprint'
 Assert-True ((Get-ContentSha256 -Text 'SELECT 1;') -ne (Get-ContentSha256 -Text 'SELECT 1; ')) 'Whitespace edits remain observable'
 
+. (Join-Path $PSScriptRoot 'EditorTransfer.Tests.ps1')
+
 $files = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object {
     $_.Extension -in @('.ps1', '.psm1') -and $_.FullName -notmatch '[\\/](\.git|node_modules)[\\/]'
 })

@@ -42,6 +42,12 @@ Get-BrowserEditor uses the same transfer without paste. Hashing normalizes CRLF/
 
 No automatic execution occurs. Focus changes are deliberate only during editor operations, after passive target discovery. Clipboard restoration happens in finally, with restoration status reported on success and a warning on failure.
 
+### Transfer verification boundary
+
+`New-EditorDesktop` supplies private scriptblock operations for page/editor binding, clipboard snapshot/restore, focus checks, keyboard input, clipboard text, polling delay, and accessibility confirmation of emptiness. `Invoke-EditorTransfer` and `Copy-EditorText` run the same orchestration with either those operations or a fully simulated desktop. Public editor commands always select the real operations; injection is not exposed as a CLI option or a new browser adapter.
+
+`tests/EditorTransfer.Tests.ps1` replaces every desktop operation, including delays, and exercises real transfer orchestration with an in-memory editor/clipboard. These tests verify guard ordering, failure propagation, bounded polling, restoration attempts, and no blind retry/rollback. They do not prove Windows focus behavior, clipboard format fidelity, Chrome accessibility support, or keyboard delivery. The opt-in [local editor procedure](verification-scenarios.md#disposable-local-editor-fixture) covers the separate desktop boundary.
+
 ## Approval boundary
 
 The agent's behavioral contract distinguishes independent Run from delivery/completion. Bundled scripts expose no execution or submission capability. This is not a sandbox: inherited global tools can still perform actions, so their use must follow the contract. There is no persistent "approved" flag that can accidentally authorize a future code revision.

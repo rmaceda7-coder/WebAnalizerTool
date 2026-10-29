@@ -4,6 +4,10 @@ Notable changes are recorded here. Versions follow Semantic Versioning once rele
 
 ## 0.2.0 — Unreleased
 
+- Private injectable desktop operations and deterministic editor-transfer tests for guards, clipboard/focus failures, empty editors, Unicode, delayed copy, and readback mismatch.
+- Disposable local HTML editor, loopback-only opt-in fixture server, server tests, and a documented manual desktop procedure.
+- Expanded operating-contract guidance for passive attachment, connection-page limitations, and current-revision approval before submission/completion-triggering execution.
+- Dated implementation history with source/test links and verification evidence; contributor and agent instructions require traceability documentation for future changes and align authorized publication with `main`.
 - Project-local read-only `browser_vision` MCP with direct PNG image content for visible browser tables, charts, and diagrams.
 - Bound, DPI-aware `PrintWindow` capture cropped to the page viewport, in-memory encoding, blank-image detection, and target/bounds rechecks.
 - UTF-8 discovery/read CLI output for the Node bridge; no image-file read permission round trip.

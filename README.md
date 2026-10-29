@@ -100,7 +100,7 @@ Verification:
 ```powershell
 powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File tests/Run-Tests.ps1
 pwsh.exe -NoProfile -STA -File tests/Run-Tests.ps1
-node --test tests/browser-vision-mcp.test.mjs
+node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs
 ```
 
 ## Project layout
@@ -110,7 +110,7 @@ node --test tests/browser-vision-mcp.test.mjs
 .opencode/skills/       Target discovery, page analysis, editor workflow
 src/                   Windows UI Automation module and Win32 adapter
 scripts/               JSON CLI entry points
-tests/                 Dependency-free policy, fingerprint, syntax, and config checks
+tests/                 Policy/transfer checks, MCP tests, and opt-in local editor fixture
 docs/                  Architecture, usage, manual verification, and roadmap
 .github/               CI, issue template, pull request template
 AGENTS.md              Persistent operating contract
@@ -126,6 +126,7 @@ AUTHORS.md             Creator signature and contact publication status
 - [Contributing](CONTRIBUTING.md)
 - [Security reporting](SECURITY.md)
 - [Changelog](CHANGELOG.md)
+- [Implementation history and verification traceability](docs/implementation-history.md)
 
 ## Creator / Creador
 

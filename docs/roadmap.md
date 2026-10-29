@@ -9,7 +9,7 @@
 
 ## Next candidates
 
-1. An opt-in local test page and desktop harness for editor behavior, including clipboard failure/focus-loss tests.
+1. Record opt-in live editor compatibility results using the shipped local fixture; deterministic clipboard failure/focus-loss transfer tests are now included.
 2. Stable tab/document identity through a passive attachment mechanism verified not to open connection pages.
 3. Dedicated Monaco/CodeMirror adapters, with accurate capability detection.
 4. Explicitly requested secondary-monitor targeting using monitor identity, never global-focus fallback.

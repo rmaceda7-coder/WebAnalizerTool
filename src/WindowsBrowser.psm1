@@ -156,31 +156,74 @@ function Assert-EditorFocus {
     }
 }
 
+function New-EditorDesktop {
+    # Private test seam. Public commands always use these real desktop operations.
+    return @{
+        BindPage = {
+            param($Url, $Handle)
+            Get-BoundPage -ExpectedUrl $Url -ExpectedWindowHandle $Handle
+        }
+        FindEditor = {
+            param($Document, $Name)
+            Get-ExactEditor -Document $Document -EditorName $Name
+        }
+        SnapshotClipboard = {
+            $oldClipboard = [System.Windows.Forms.Clipboard]::GetDataObject()
+            # Materialize formats before changing focus or replacing the clipboard.
+            $savedClipboard = New-Object System.Windows.Forms.DataObject
+            if ($null -ne $oldClipboard) {
+                foreach ($format in $oldClipboard.GetFormats($false)) {
+                    $savedClipboard.SetData($format, $oldClipboard.GetData($format, $false))
+                }
+            }
+            return $savedClipboard
+        }
+        RestoreClipboard = {
+            param($Snapshot)
+            if ($Snapshot.GetFormats().Count -gt 0) {
+                [System.Windows.Forms.Clipboard]::SetDataObject($Snapshot, $true)
+            } else { [System.Windows.Forms.Clipboard]::Clear() }
+        }
+        FocusWindow = { param($Handle) [WebAnalyzer.NativeDesktop]::Focus($Handle) }
+        FocusEditor = { param($Editor) $Editor.SetFocus() }
+        AssertFocus = {
+            param($Editor, $Handle)
+            Assert-EditorFocus -Editor $Editor -WindowHandle $Handle
+        }
+        SetClipboardText = { param($Text) [System.Windows.Forms.Clipboard]::SetText($Text) }
+        GetClipboardText = { [System.Windows.Forms.Clipboard]::GetText() }
+        SendKeys = { param($Keys) [System.Windows.Forms.SendKeys]::SendWait($Keys) }
+        Delay = { param($Milliseconds) Start-Sleep -Milliseconds $Milliseconds }
+        IsEmptyEditor = {
+            param($Editor)
+            $pattern = $null
+            if ($Editor.TryGetCurrentPattern([System.Windows.Automation.TextPattern]::Pattern, [ref]$pattern)) {
+                return $pattern.DocumentRange.GetText(-1) -ceq ''
+            }
+            return $false
+        }
+    }
+}
+
 function Copy-EditorText {
-    param($Editor, [long]$WindowHandle)
-    Assert-EditorFocus -Editor $Editor -WindowHandle $WindowHandle
+    param($Editor, [long]$WindowHandle, [hashtable]$Desktop)
+    & $Desktop.AssertFocus $Editor $WindowHandle
     # Sentinel distinguishes empty/unsupported copy from stale clipboard contents.
     $sentinel = '__web_analyzer_' + [Guid]::NewGuid().ToString('N')
-    [System.Windows.Forms.Clipboard]::SetText($sentinel)
-    [System.Windows.Forms.SendKeys]::SendWait('^a')
-    Assert-EditorFocus -Editor $Editor -WindowHandle $WindowHandle
-    [System.Windows.Forms.SendKeys]::SendWait('^c')
+    & $Desktop.SetClipboardText $sentinel
+    & $Desktop.SendKeys '^a'
+    & $Desktop.AssertFocus $Editor $WindowHandle
+    & $Desktop.SendKeys '^c'
     $copied = $sentinel
     for ($i = 0; $i -lt 20; $i++) {
-        Start-Sleep -Milliseconds 50
-        $copied = [System.Windows.Forms.Clipboard]::GetText()
+        & $Desktop.Delay 50
+        $copied = & $Desktop.GetClipboardText
         if ($copied -cne $sentinel) { break }
     }
-    Assert-EditorFocus -Editor $Editor -WindowHandle $WindowHandle
+    & $Desktop.AssertFocus $Editor $WindowHandle
     if ($copied -ceq $sentinel) {
         # Empty editors often leave the clipboard untouched. Confirm through UIA.
-        $pattern = $null
-        if ($Editor.TryGetCurrentPattern([System.Windows.Automation.TextPattern]::Pattern, [ref]$pattern)) {
-            $rangeText = $pattern.DocumentRange.GetText(-1)
-            if ($rangeText -ceq '') {
-                return ''
-            }
-        }
+        if (& $Desktop.IsEmptyEditor $Editor) { return '' }
         throw 'Copy did not expose editor text. The editor may be unsupported; no write was attempted.'
     }
     return $copied
@@ -193,50 +236,45 @@ function Invoke-EditorTransfer {
         [string]$EditorName,
         [AllowEmptyString()][string]$Code,
         [string]$ExpectedContentSha256,
-        [switch]$Write
+        [switch]$Write,
+        [hashtable]$Desktop
     )
-    $page = Get-BoundPage -ExpectedUrl $ExpectedUrl -ExpectedWindowHandle $ExpectedWindowHandle
-    $editor = Get-ExactEditor -Document $page.Document -EditorName $EditorName
-    $oldClipboard = [System.Windows.Forms.Clipboard]::GetDataObject()
-    # Materialize clipboard formats before changing focus or replacing the clipboard.
-    $savedClipboard = New-Object System.Windows.Forms.DataObject
-    if ($null -ne $oldClipboard) {
-        foreach ($format in $oldClipboard.GetFormats($false)) {
-            $savedClipboard.SetData($format, $oldClipboard.GetData($format, $false))
-        }
-    }
+    if ($null -eq $Desktop) { $Desktop = New-EditorDesktop }
+    $page = & $Desktop.BindPage $ExpectedUrl $ExpectedWindowHandle
+    $editor = & $Desktop.FindEditor $page.Document $EditorName
+    $savedClipboard = & $Desktop.SnapshotClipboard
     $restored = $false
     $previous = $null
     $result = $null
     try {
-        if (-not [WebAnalyzer.NativeDesktop]::Focus($ExpectedWindowHandle)) {
+        if (-not (& $Desktop.FocusWindow $ExpectedWindowHandle)) {
             throw 'Windows refused to focus the identified Chrome window.'
         }
-        $editor.SetFocus()
-        $previous = Copy-EditorText -Editor $editor -WindowHandle $ExpectedWindowHandle
+        & $Desktop.FocusEditor $editor
+        $previous = Copy-EditorText -Editor $editor -WindowHandle $ExpectedWindowHandle -Desktop $Desktop
         $previousHash = Get-ContentSha256 -Text $previous
         if ($Write) {
             if ($previousHash -cne $ExpectedContentSha256) {
                 throw 'Editor content changed since capture. Read and review the current code before replacing it.'
             }
-            $null = Get-BoundPage -ExpectedUrl $ExpectedUrl -ExpectedWindowHandle $ExpectedWindowHandle
-            Assert-EditorFocus -Editor $editor -WindowHandle $ExpectedWindowHandle
+            $null = & $Desktop.BindPage $ExpectedUrl $ExpectedWindowHandle
+            & $Desktop.AssertFocus $editor $ExpectedWindowHandle
             # Ctrl+A from capture still selects editor content. Paste preserves quotes and newlines.
             if ($Code.Length -eq 0) {
-                [System.Windows.Forms.SendKeys]::SendWait('{BACKSPACE}')
+                & $Desktop.SendKeys '{BACKSPACE}'
             } else {
-                [System.Windows.Forms.Clipboard]::SetText($Code)
-                [System.Windows.Forms.SendKeys]::SendWait('^v')
+                & $Desktop.SetClipboardText $Code
+                & $Desktop.SendKeys '^v'
             }
-            Start-Sleep -Milliseconds 200
-            $actual = Copy-EditorText -Editor $editor -WindowHandle $ExpectedWindowHandle
+            & $Desktop.Delay 200
+            $actual = Copy-EditorText -Editor $editor -WindowHandle $ExpectedWindowHandle -Desktop $Desktop
             if ((Get-ContentSha256 -Text $actual) -cne (Get-ContentSha256 -Text $Code)) {
                 throw 'Editor readback differs from the intended code. Inspect the current editor before retrying; no execution was requested.'
             }
         } else { $actual = $previous }
-        $null = Get-BoundPage -ExpectedUrl $ExpectedUrl -ExpectedWindowHandle $ExpectedWindowHandle
-        Assert-EditorFocus -Editor $editor -WindowHandle $ExpectedWindowHandle
-        [System.Windows.Forms.SendKeys]::SendWait('{RIGHT}')
+        $null = & $Desktop.BindPage $ExpectedUrl $ExpectedWindowHandle
+        & $Desktop.AssertFocus $editor $ExpectedWindowHandle
+        & $Desktop.SendKeys '{RIGHT}'
         $result = [pscustomobject]@{
             Context = $page.Context
             EditorName = $EditorName
@@ -251,9 +289,7 @@ function Invoke-EditorTransfer {
         }
     } finally {
         try {
-            if ($null -ne $oldClipboard -and $savedClipboard.GetFormats().Count -gt 0) {
-                [System.Windows.Forms.Clipboard]::SetDataObject($savedClipboard, $true)
-            } else { [System.Windows.Forms.Clipboard]::Clear() }
+            & $Desktop.RestoreClipboard $savedClipboard
             $restored = $true
         } catch {
             Write-Warning 'Could not restore the clipboard. The editor operation must not be retried automatically.'
