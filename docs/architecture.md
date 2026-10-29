@@ -2,16 +2,17 @@
 
 ## Web testing scope
 
-The project supports web test automation through application inspection, scenario/assertion design, evidence collection, and guarded preparation of test code. The Windows adapter implements discovery, accessibility reading, viewport capture, and editor transfer. General clicks, form entry, navigation, and end-to-end execution require separately implemented, verified capabilities. Reports must distinguish proposed scenarios, prepared scripts, observed UI state, and executed assertion results.
+The project supports web test automation through application inspection, scenario/assertion design, evidence collection, guarded code preparation, and authorized connected-runner execution. The Windows adapter implements discovery, accessibility reading, viewport capture, and editor transfer. Connected MCP servers can independently supply clicks, fields, navigation, API requests, and test execution; no new Windows adapter implementation is required to use them. Their session/target, effects, and permissions must be verified. Reports distinguish proposed scenarios, prepared scripts, observed UI state, performed interactions, and executed assertion results. See [MCP capabilities](mcp-capabilities.md).
 
 ## Layers
 
 1. **Operating contract:** AGENTS.md records monitor selection, passive discovery, and approval policy.
 2. **OpenCode agent:** `.opencode/agents/web-analyzer.md` coordinates relevant skills; project config selects it as the default primary agent.
-3. **Skills:** context discovery, page analysis, editor capture/write/review.
+3. **Skills:** context discovery, page analysis, editor capture/write/review, and connected-MCP orchestration.
 4. **CLI:** `scripts/*.ps1` provides JSON wrappers with mandatory target preconditions.
 5. **Adapter:** `src/WindowsBrowser.psm1` implements UI Automation and editor transfer; `NativeDesktop.cs` isolates Win32 monitor/Z-order/focus calls.
 6. **Verification:** dependency-free checks run in Windows PowerShell 5.1 and PowerShell 7. Manual tests cover the real desktop.
+7. **Connected servers:** inherited task-relevant MCP capabilities are coordinated through the operating contract, not implemented by the Windows adapter. No global configuration or blanket permission changes are needed by this policy.
 
 ## Target identity
 
@@ -19,7 +20,7 @@ Native EnumWindows supplies top-to-bottom Z-order. MonitorFromWindow/GetMonitorI
 
 UI Automation must expose exactly one visible HTTP(S) Document. Its URL, native window handle, monitor identity, and page title form the reported context. Commands re-resolve and compare URL/handle before operating and again after reading/transferring. A changed URL (including path case or test-scenario query parameters) invalidates the binding.
 
-The binding is not a stable browser tab ID: two tabs can share the same URL, or a page may mutate without URL changes. The content fingerprint additionally protects editor writes. A future CDP/extension adapter may add stable tab/document IDs, but only if it can attach without side-effect navigation.
+The binding is not a stable browser tab ID: two tabs can share the same URL, or a page may mutate without URL changes. The content fingerprint additionally protects editor writes. A runner claiming same-page control must establish an unambiguous mapping to this desktop target; matching URLs alone are insufficient. Passive discovery cannot open connection pages. Explicitly requested tool-driven setup may open a disclosed connection page or managed browser under the session-mode rules; verify that session separately and never label it as the existing desktop session without evidence.
 
 ## Visual capture
 
@@ -54,9 +55,11 @@ No automatic execution occurs. Focus changes are deliberate only during editor o
 
 ## Approval boundary
 
-The agent's behavioral contract distinguishes independently verified Run operations from form submission, persistent application changes, and workflow completion. Approval is scoped to the current test code/action plan, environment, and page. Bundled scripts expose no execution or submission capability. This is not a sandbox: inherited global tools can still perform actions, so their use must follow the contract. There is no persistent "approved" flag that can accidentally authorize a future code revision.
+The agent's behavioral contract permits announced, verified non-persistent functional checks and distinguishes independently verified Run operations from form submission, persistent application changes, and workflow completion. Approval is scoped to the current test code/action plan, environment, and planned routes. Publishing, destructive actions, load generation, and unknown effects require explicit authorization. Bundled scripts expose no execution/submission capability, but verified connected runners may execute authorized work. This is not a sandbox: inherited tools and host permissions remain independent. There is no persistent "approved" flag that can accidentally authorize a future code revision.
 
 ## Limitations
+
+The desktop limitations below apply to the shipped Windows adapter, not to all connected MCP servers. Runner sessions may support other browsers/headless execution but do not inherit the desktop target's monitor, profile, or authentication identity. Actual compatibility requires separate verification.
 
 - Windows 10/11 desktop and Chrome only. No headless or service session support.
 - Foremost **Chrome** window on primary monitor is selected even if another app is in front of it. No secondary page content is traversed. The user must resolve any mismatch between "monitor 1" and Windows' configured primary display.
@@ -72,4 +75,4 @@ The agent's behavioral contract distinguishes independently verified Run operati
 
 ## Extension contract
 
-A future adapter must expose passive context discovery, bound page reading, editor capture, guarded writing, and verified readback. Document OS/browser requirements, target identity, focus/navigation effects, and unsupported cases. Add deterministic selection tests and opt-in manual scenarios. Never silently substitute a launched browser session for the user's existing one.
+A future adapter replacing the desktop workflow must expose passive context discovery, bound page reading, editor capture, guarded writing, and verified readback. Document OS/browser requirements, target identity, focus/navigation effects, and unsupported cases. Add deterministic selection tests and opt-in manual scenarios. This extension contract does not require every connected API/performance/browser server to implement desktop editor transfer. Use their verified capabilities through the [routing policy](mcp-capabilities.md). Never silently substitute a launched browser session for the user's existing one.

@@ -5,6 +5,8 @@ description: Identifies the selected page of the existing Chrome window on the p
 
 # Identify the existing page
 
+This skill applies to passive current-page discovery, not to an explicitly selected managed test session. Read `docs/mcp-capabilities.md` and use `mcp-tool-orchestration` before connecting an interaction runner. Never call runner startup merely to discover the user's current page.
+
 1. From the project root run:
     `powershell.exe -NoProfile -STA -File scripts/Get-PrimaryBrowserContext.ps1`
    When available, prefer `browser_vision` MCP's `get_primary_browser_context`, which calls the same adapter without a shell prompt or file artifact.
@@ -20,3 +22,4 @@ description: Identifies the selected page of the existing Chrome window on the p
 - If the Windows primary display does not correspond to the display the user means by "1", ask them to resolve the mapping; do not assume a device suffix is a Settings number.
 - Missing Chrome, inaccessible UI Automation, ambiguous documents, lock screens, and elevated-process mismatches are blockers to report.
 - Other browsers/displays require an explicitly requested adapter extension; they are not supported by the initial release.
+- Playwright/Selenium can be used after session-mode selection under `AGENTS.md`. Verify an unambiguous mapping before claiming same-page attachment; matching URLs alone are insufficient. If the user authorizes a separate test session, report it as separate and use its own identity rather than a desktop window binding.

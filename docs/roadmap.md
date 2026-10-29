@@ -1,6 +1,6 @@
 # Roadmap
 
-The primary objective is web test automation: application inspection, test scenario/assertion design, automation code preparation, and evidence-based reporting. The current runtime supports passive inspection and guarded editor transfers; form interaction and test execution are extension work.
+The primary objective is web test automation: application inspection, test scenario/assertion design, automation code preparation, authorized execution, and evidence-based reporting. The Windows runtime supports passive inspection and guarded editor transfers. Connected servers can supply interaction and execution under the [MCP routing policy](mcp-capabilities.md); that policy is not itself a new runtime integration or proof of live compatibility.
 
 ## Initial foundation (0.1.x)
 
@@ -16,7 +16,7 @@ The primary objective is web test automation: application inspection, test scena
 3. Dedicated Monaco/CodeMirror adapters, with accurate capability detection.
 4. Explicitly requested secondary-monitor targeting using monitor identity, never global-focus fallback.
 5. Edge/Firefox adapters with separate compatibility evidence.
-6. Verified web interaction and test-runner integrations, with environment/revision-scoped approval, explicit action effects, and actual assertion-result reporting.
+6. Record live compatibility evidence for connected interaction/test runners, with environment/revision-scoped approval, disclosed setup effects, session identity, artifact behavior, and actual assertion-result reporting. Policy routing is available; each live transport still needs verification.
 7. Optional global OpenCode installation tooling that preserves existing user configuration.
 
 Each item needs tests and documented side effects before becoming supported. Broader browser support is not implied by the initial implementation.

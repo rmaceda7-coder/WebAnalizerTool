@@ -86,12 +86,16 @@ Assert-True ($config.mcp.browser_vision.command[0] -eq 'node' -and
     (Test-Path -LiteralPath (Join-Path $root $config.mcp.browser_vision.command[1]))) 'MCP entry point exists'
 Assert-True (Test-Path -LiteralPath (Join-Path $root '.opencode/agents/web-analyzer.md')) 'Default agent file exists'
 $skills = @(Get-ChildItem -LiteralPath (Join-Path $root '.opencode/skills') -Directory)
-Assert-True ($skills.Count -eq 3) 'All three workflow skills are installed'
+$expectedSkills = @('active-browser-context', 'browser-code-editor', 'mcp-tool-orchestration', 'web-page-analysis')
+Assert-True (($skills.Count -eq $expectedSkills.Count) -and
+    (@(Compare-Object $expectedSkills @($skills.Name)).Count -eq 0)) 'All four named workflow skills are installed'
 foreach ($skill in $skills) {
     $body = [IO.File]::ReadAllText((Join-Path $skill.FullName 'SKILL.md'))
     Assert-True ($body -match ('(?m)^name: ' + [regex]::Escape($skill.Name) + '$')) "Skill name matches folder: $($skill.Name)"
     Assert-True ($body -match '(?m)^description: .+') "Skill has discoverable description: $($skill.Name)"
 }
+
+. (Join-Path $PSScriptRoot 'McpPolicy.Tests.ps1')
 
 if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
     if (-not ('WebAnalyzer.NativeDesktop' -as [type])) {

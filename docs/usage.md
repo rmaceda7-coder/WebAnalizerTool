@@ -1,6 +1,6 @@
 # Installation and usage
 
-This workflow supports web test automation: inspect an application, identify test scenarios and assertions, prepare automation code, and report observed behavior with evidence. The bundled adapter provides passive page inspection and guarded code-editor transfers. It does not provide general form interaction or end-to-end test execution.
+This workflow supports web test automation: inspect an application, identify scenarios/assertions, prepare automation code, perform authorized tests with connected runners, and report actual behavior. The bundled Windows adapter provides passive inspection and guarded editor transfers, not general interaction/execution; connected MCP servers have independent capabilities. See [the routing and approval guide](mcp-capabilities.md).
 
 ## Install for OpenCode
 
@@ -61,7 +61,24 @@ Use the captured page text and, when needed, bound viewport images to identify c
 | Dashboard smoke test | Expected headings, status labels, visible totals | Current labels/values compared with supplied requirements |
 | Data-grid regression | Empty/loading/error states, sorting, filtering | Observed state transitions and output after authorized interactions |
 
-Record preconditions, expected results, observed results, and gaps. Scenario design is not test execution. If a transition requires an unsupported interaction, report the limitation and prepare a test for a separately verified runner.
+Record preconditions, expected results, observed results, and gaps. Scenario design is not test execution. If the Windows adapter cannot perform a transition, check for a suitable authorized connected runner rather than declaring all interaction unsupported. Report any remaining connection/permission/target limitation precisely.
+
+## Use connected runners and other MCP tools
+
+Load `mcp-tool-orchestration` and read [MCP capabilities](mcp-capabilities.md). Tools inherited from global configuration remain available subject to host permissions; this project does not duplicate their definitions or enable blanket access.
+
+- **Existing-page request:** discover/report the desktop target passively first. A runner must prove it controls that page/session before acting. A matching URL alone is insufficient. Extension startup is not passive discovery.
+- **Explicit Playwright/Selenium test request:** announce ordinary setup effects before connecting or launching. Such a request permits ordinary disclosed setup unless existing-session-only or no-new-page constraints conflict. Ask about conflicting/unknown effects; leave extension consent to the user. Verify/report the actual runner target after setup. A separate session may lack the user's cookies/login state.
+- **URL-only request:** navigate in a verified session, or ask to authorize/select setup if a new browser or extension connection is needed. Do not silently replace the user's session.
+- **Functional plan:** check ordinary navigation, menus, local controls, keyboard/responsive behavior, and available diagnostics where relevant after verifying non-persistent effects. Ask before submissions, persistent changes, workflow completion, or unknown effects. Report actual assertions and blocked cases.
+- **Other servers:** use Postman for authorized collection/API work, JMeter for analysis or explicitly approved load, GitHub tooling for requested repository work, and filesystem/Serena/AI tools for relevant preparation or analysis. Follow each server's initialization, scope, and effects requirements.
+- **No-file report:** avoid file-producing screenshots, traces, downloads, generated reports, and logs. Omitting a filename does not guarantee memory-only behavior. Use verified in-memory evidence or explain the limitation.
+
+Example request:
+
+> Use Playwright MCP to test https://example.test navigation and non-persistent controls. Disclose startup effects, do not submit forms, and report actual results here without evidence files.
+
+After configuration or guidance changes, quit and restart OpenCode. The running agent retains its already-loaded restrictions; edits do not hot-reload capabilities or prove server connectivity.
 
 ## Prepare test code in an identified editor
 
@@ -104,7 +121,7 @@ CLI entry points return equivalent JSON; see the skill for `-CodePath` syntax. T
 
 Show the prepared test code, explain the assertions, and state that it remains unexecuted. Ask for approval before form submission, saving application data, workflow-finalizing actions, or Run with unknown effects. Approval applies to the current test code/action plan, target environment, and page.
 
-The bundled adapter does not implement Run/Submit. Following approval, an agent needs a separately verified same-page interaction capability; it must not open a welcome/connection page. Without that capability, let the user execute manually rather than pretending execution happened.
+The bundled adapter does not implement Run/Submit. Following approval, use a verified interaction capability in the agreed session. Same-page execution requires an unambiguous attachment mapping; separate-session testing requires disclosed setup and verified code/target. Connection pages are allowed only as intentional setup under the session-mode rules, never passive discovery or the application under test. If no suitable capability is available, report the blocker rather than pretending execution happened.
 
 After an actual test run, inspect runner output and assertion results. Report execution attempted, execution completed, and assertions passed/failed separately. A prepared script, a successful editor transfer, or an old result on the page does not prove that a test passed.
 

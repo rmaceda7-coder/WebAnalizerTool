@@ -4,6 +4,42 @@ This index records why changes were made, where they were implemented, and what 
 
 Every new implementation or behavior/policy change must add a dated entry here and update the relevant documentation. Link published commits/PRs or GitHub file history so the evidence remains traceable. An automated result does not establish live browser compatibility. GitHub Actions results belong to their exact commit and must be checked separately after publication.
 
+## WAT-006 — Connected-MCP orchestration and explicit browser session modes
+
+- **Date:** 2026-10-29
+- **Release:** 0.2.0 (unreleased)
+- **Publication:** User authorized publication to `main`; commit/push and hosted verification are pending at preparation time.
+- **Implementation history:** [contract history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/AGENTS.md), [agent history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/.opencode/agents/web-analyzer.md), and [this record's history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/docs/implementation-history.md). New-file links become available after authorized publication.
+
+### Requirement and changes
+
+The user requested guidelines that use the full relevant capabilities of connected MCP servers after functional testing was limited to passive inspection. The checked-in primary agent and contract contained blanket Playwright connection-page/Selenium startup restrictions, while the runtime adapter itself only implements passive reads and guarded editor transfer.
+
+Separated passive existing-page discovery from explicitly requested tool-driven test-session setup. Retained primary-monitor selection and strict same-page identity for existing sessions; permitted ordinary disclosed Playwright/Selenium setup when explicitly requested and not in conflict with session constraints. A URL-only request still does not silently authorize browser startup. Added routine non-persistent functional checks with side-effect review, while retaining scoped approval for submission, persistent changes, workflow completion, publishing, destructive actions, unknown effects, and load generation.
+
+Added a connected-MCP capability matrix, server initialization/scope requirements, no-file handling for implicit artifacts, denial-versus-technical-limitation guidance, and the `mcp-tool-orchestration` skill. Updated browser skills and user documentation to avoid applying Windows-adapter limitations to all servers. No global configuration, server definitions, credentials, permissions, or Windows runtime implementations were changed. Documentation changes do not override higher-priority instructions already loaded in the current session; OpenCode must be restarted.
+
+### Affected files
+
+| Area | Files |
+|---|---|
+| Contract and primary agent | [`AGENTS.md`](../AGENTS.md), [`.opencode/agents/web-analyzer.md`](../.opencode/agents/web-analyzer.md) |
+| Skills | [MCP orchestration](../.opencode/skills/mcp-tool-orchestration/SKILL.md), [context discovery](../.opencode/skills/active-browser-context/SKILL.md), [page analysis](../.opencode/skills/web-page-analysis/SKILL.md), [editor workflow](../.opencode/skills/browser-code-editor/SKILL.md) |
+| Capability and usage guidance | [`docs/mcp-capabilities.md`](mcp-capabilities.md), [`README.md`](../README.md), [`docs/usage.md`](usage.md), [`docs/architecture.md`](architecture.md), [`docs/roadmap.md`](roadmap.md), [`SECURITY.md`](../SECURITY.md) |
+| Policy regression and manual scenarios | [`tests/McpPolicy.Tests.ps1`](../tests/McpPolicy.Tests.ps1), [`tests/Run-Tests.ps1`](../tests/Run-Tests.ps1), [`docs/verification-scenarios.md`](verification-scenarios.md) |
+| Traceability | [`CHANGELOG.md`](../CHANGELOG.md), this record |
+
+### Verification and pending checks
+
+- `powershell.exe -NoProfile -STA -File tests/Run-Tests.ps1`: blocked by the default Windows PowerShell script execution policy. `Get-ExecutionPolicy -List` showed no configured MachinePolicy/UserPolicy. No persistent execution-policy setting was changed.
+- `powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File tests/Run-Tests.ps1`: all 150 checks passed using the existing documented process-only invocation, including the new static policy checks. No live browser/editor was changed.
+- `pwsh.exe -NoProfile -STA -File tests/Run-Tests.ps1`: all 150 checks passed.
+- `node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs`: all 6 tests passed. The loopback fixture test did not launch a browser.
+- `opencode agent list`: completed successfully, listed `web-analyzer (primary)`, and included the new orchestration skill directory. This is a loader check, not proof of runtime model behavior or authenticated MCP connectivity.
+- `git diff --check`: passed; reviewed tracked changes and new policy/skill/test files. Git emitted its existing LF-to-CRLF normalization notice for PowerShell files; no whitespace errors were reported.
+- Restart OpenCode and opt in to relevant connected-MCP manual scenarios before claiming live compatibility. No live runner startup, editor interaction, Postman collection run, JMeter load, or GitHub publication is part of this policy change's unattended checks.
+- The user authorized GitHub synchronization to `main`. Publish the guideline/test changes and this evidence together, then record the resulting implementation commit and hosted verification. File-history links provide traceability without requiring a commit to contain its own hash.
+
 ## WAT-005 — Web test automation purpose and QA-focused examples
 
 - **Date:** 2026-10-29

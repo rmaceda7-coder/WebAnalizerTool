@@ -4,6 +4,7 @@ Notable changes are recorded here. Versions follow Semantic Versioning once rele
 
 ## 0.2.0 — Unreleased
 
+- Replaced blanket Playwright/Selenium startup bans with passive current-page and disclosed tool-driven test-session modes. Added connected-MCP capability routing, server prerequisites, scoped approval/artifact rules, orchestration skill, and automated policy-regression checks. No global configuration, credentials, host permissions, or server implementations were changed; live connectivity remains separately verified.
 - Reframed project purpose, agent/skill guidance, examples, and fixture terminology around web test automation, including smoke/regression scenarios, validation assertions, and expected-versus-observed reporting. Documented the current inspection/editor-transfer capability boundary separately from future interaction and test-runner integrations.
 - Standardized documentation in English: translated README example prompts and creator labels, replaced non-English operating-contract examples with English guidance, and established an English-only documentation requirement.
 - Private injectable desktop operations and deterministic editor-transfer tests for guards, clipboard/focus failures, empty editors, Unicode, delayed copy, and readback mismatch.

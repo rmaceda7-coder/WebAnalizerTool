@@ -1,6 +1,6 @@
 # WebAnalizerTool — Web Analyzer and Acting Tool
 
-An automation foundation for **web application testing**: inspect the existing Chrome page on the **primary Windows monitor**, compare observed UI behavior with test expectations, and prepare test code with verified editor transfers.
+An automation foundation for **web application testing**: inspect the existing Chrome page on the **primary Windows monitor**, coordinate connected MCP tools for functional testing, compare behavior with expectations, and prepare code with verified editor transfers.
 
 [![Verify](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/workflows/verify.yml)
 
@@ -11,12 +11,13 @@ An automation foundation for **web application testing**: inspect the existing C
 - Reads the selected page through Windows UI Automation without opening a browser, welcome tab, or connection page.
 - Analyzes visible image-based tables and diagrams through a project-local MCP that returns the page viewport directly as PNG image content, without intermediate screenshot files.
 - Captures existing editor text, checks its fingerprint before replacing it, and verifies the resulting code by clipboard readback.
-- Provides an OpenCode primary agent and three focused workflow skills.
+- Provides an OpenCode primary agent and four focused workflow skills, including connected-tool orchestration.
+- Routes authorized work to connected Playwright, Selenium, Postman, JMeter, GitHub, filesystem, Serena, and AI-assistance tools according to actual capabilities, session identity, and approval scope.
 - Leaves prepared test code for review. **Bundled commands expose no test runner, form-submit action, or record-saving action.**
 
-The current adapter provides page discovery, accessibility reading, viewport capture, and guarded code-editor transfers. General clicking, form filling, navigation, and end-to-end test execution require separately implemented and verified capabilities. Proposed test scenarios and generated scripts are not evidence that a test has run.
+The Windows adapter provides discovery, accessibility reading, viewport capture, and guarded code-editor transfers. Connected runners can supply clicking, fields, navigation, and execution without a new Windows adapter implementation; their connection, target, effects, and permissions must be verified. Proposed scenarios and generated scripts are not evidence that a test has run. See [MCP capabilities and policy](docs/mcp-capabilities.md).
 
-**Initial support:** Windows 10/11, an existing Chrome session, and accessible code editors that implement Ctrl+A/C/V reliably. Other browsers, secondary-display targeting, remote desktops, and arbitrary editors are not yet supported adapters. See [limitations](docs/architecture.md#limitations).
+**Bundled adapter support:** Windows 10/11, an existing Chrome session, and accessible code editors that implement Ctrl+A/C/V reliably. Other browsers, secondary-display targeting, remote desktops, and arbitrary editors are not supported by that adapter. Connected servers have their own compatibility/session requirements. See [limitations](docs/architecture.md#limitations).
 
 ## Quick start
 
@@ -53,6 +54,10 @@ This is a project-local installation. It does not modify your global OpenCode co
 
 > Prepare a Playwright test for required-field validation on the login form and leave the test code in the identified editor for my review. Do not run it.
 
+> Use Playwright MCP for a basic functional test of https://example.test. Disclose connection or new-browser effects, check navigation and non-persistent controls, and report actual assertions here. Do not submit forms or create evidence files.
+
+> Use the connected JMeter tools to analyze my existing results. Do not generate load or write visualizations.
+
 The agent reports the page identity, inspects the application against test requirements, identifies assertions and defects, and prepares requested test code with readback verification. It distinguishes proposed tests, observed results, and actual execution. See [the walkthrough](docs/usage.md).
 
 ## Test actions and execution controls
@@ -60,12 +65,17 @@ The agent reports the page identity, inspects the application against test requi
 | Action | Behavior |
 |---|---|
 | Identify/read primary-display page | Passive; no navigation, focus change, or clipboard access |
+| Explicitly requested Playwright/Selenium testing session | Ordinary setup permitted after disclosing effects, unless session/no-new-page constraints conflict; verify the actual runner target |
+| Routine non-persistent functional checks | May proceed within an announced testing plan after effects are verified |
 | Capture or edit browser code after an editing request | May focus Chrome and temporarily use clipboard; attempts restoration |
-| Run verified as independent of form submission, persistent changes, and workflow completion | Agent may run if a verified same-page transport is available |
+| Run verified as independent of form submission, persistent changes, and workflow completion | Agent may run in the verified, agreed session under the execution policy |
 | Submit forms, save application data, complete a workflow, or use Run with unknown effects | Ask for explicit approval of the current test code/action plan first |
-| Change test code, action plan, or target after approval | Request new approval before the affected action |
+| Publish remote changes, perform destructive operations, or generate load | Requires explicit scoped authorization |
+| Material code/effect changes or unrelated target/environment after approval | Request new approval before the affected action; planned route transitions stay within scope |
 
 A button named Run or Test does not establish its effects. Verify the operation and target environment before execution; the bundled adapter does not provide a test runner.
+
+Current-page discovery remains passive. Requested runner setup is a separate mode and may open a connection page or managed browser after disclosure; never mistake that page for the application or silently substitute sessions. No-file requests also apply to screenshots, traces, downloads, and reports that other tools may save by default. These guidelines do not enable missing servers, authenticate them, or override host permissions.
 
 ## CLI commands
 
@@ -110,7 +120,7 @@ node --test tests/browser-vision-mcp.test.mjs tests/editor-fixture.test.mjs
 
 ```text
 .opencode/agents/       OpenCode primary agent
-.opencode/skills/       Target discovery, page analysis, editor workflow
+.opencode/skills/       Target discovery, page analysis, editor workflow, MCP orchestration
 src/                   Windows UI Automation module and Win32 adapter
 scripts/               JSON CLI entry points
 tests/                 Policy/transfer checks, MCP tests, and opt-in local editor fixture
@@ -126,6 +136,7 @@ All project documentation and guidelines are maintained in English.
 
 - [Installation and usage](docs/usage.md)
 - [Architecture and extension points](docs/architecture.md)
+- [Connected MCP capabilities, session modes, and approvals](docs/mcp-capabilities.md)
 - [Verification scenarios](docs/verification-scenarios.md)
 - [Roadmap](docs/roadmap.md)
 - [Contributing](CONTRIBUTING.md)
