@@ -9,7 +9,8 @@ Every new implementation or behavior/policy change must add a dated entry here a
 - **Date:** 2026-10-29
 - **Release:** 0.2.0 (unreleased)
 - **Baseline:** [4ceb144](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/4ceb144)
-- **Implementation commits:** [editor-transfer test history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/tests/EditorTransfer.Tests.ps1) and [this record's history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/docs/implementation-history.md)
+- **Implementation commit:** [fc2dfcb](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/fc2dfcb8204b46a656894c0f97cfcd78c4961a25)
+- **Documentation/evidence updates:** [this record's history](https://github.com/rmaceda7-coder/WebAnalizerTool/commits/main/docs/implementation-history.md)
 
 ### Requirement and outcome
 
@@ -47,6 +48,12 @@ Implemented:
 | `git diff --check` | Passed |
 
 The automated checks did not open Chrome, read browser content, change desktop focus, or access the real clipboard. The fixture-server test briefly listened on loopback. Node.js 22 is the configured hosted CI version; local Node.js 24 results are not a substitute for the hosted result. [Workflow runs](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/workflows/verify.yml) identify the exact verified commit.
+
+### Completed hosted verification
+
+- The implementation and documentation were pushed to `main` in [fc2dfcb](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/fc2dfcb8204b46a656894c0f97cfcd78c4961a25).
+- [Verify run 40934112636](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/runs/40934112636) completed successfully for that exact commit. The Windows job passed the Node.js 22 MCP/fixture-server tests, Windows PowerShell 5.1 tests, and PowerShell 7 tests.
+- Observed with `gh run watch 40934112636 --exit-status --interval 10`; the command exited successfully. This evidence was recorded in a subsequent documentation-only commit; it describes the implementation commit above.
 
 ### Pending manual evidence and limitations
 

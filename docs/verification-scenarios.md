@@ -121,6 +121,7 @@ Editor-transfer test extension verification on Windows, 2026-10-29:
 
 - Windows PowerShell 5.1 and PowerShell 7: all 118 checks passed in each runtime, including fully simulated editor-transfer failure scenarios. The local Windows PowerShell execution policy required the documented process-only `-ExecutionPolicy Bypass` invocation.
 - Node.js 24.20.0: all 6 tests passed across the MCP transport and loopback fixture server suites.
+- Hosted verification: [Verify run 40934112636](https://github.com/rmaceda7-coder/WebAnalizerTool/actions/runs/40934112636) passed the Node.js 22 suite and both PowerShell steps for implementation commit [fc2dfcb](https://github.com/rmaceda7-coder/WebAnalizerTool/commit/fc2dfcb8204b46a656894c0f97cfcd78c4961a25).
 - `git diff --check` passed. Automated checks did not open Chrome, inspect page contents, change desktop focus, or access the real clipboard.
 - The disposable fixture's live Chrome/UI Automation scenarios have not been executed; the manual procedure above is not a claim of compatibility or successful desktop verification.
 
